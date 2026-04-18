@@ -53,7 +53,7 @@ static func _weakest_triple(b: Dictionary) -> Array:
 	return []
 
 
-static func _weakest_single_from_hand(hand: PackedInt32Array, b: Dictionary) -> Array:
+static func _weakest_single_from_hand(hand: PackedInt32Array, _b: Dictionary) -> Array:
 	var best: int = int(hand[0])
 	var best_v := CardDefs.ddz_rank_value(best)
 	for i in range(1, hand.size()):
@@ -128,9 +128,9 @@ static func choose_free_lead(hand: PackedInt32Array, ctx: Dictionary = {}) -> Ar
 	var pr := _weakest_pair(b)
 	if not pr.is_empty():
 		return pr
-	var tr := _weakest_triple(b)
-	if not tr.is_empty():
-		return tr
+	var triple_pl := _weakest_triple(b)
+	if not triple_pl.is_empty():
+		return triple_pl
 	var sn := _seen_rank_must_play(b, ctx)
 	if not sn.is_empty():
 		return sn

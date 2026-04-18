@@ -3,7 +3,8 @@ class_name CardDefs
 
 const COUNT = 54
 const RANKS_PER_SUIT = 13
-const SUIT_NAMES = ["Diamonds", "Clubs", "Hearts", "Spades"]
+## 与 `suit_of` 一致：方块、梅花、红桃、黑桃 → 资源前缀 D/C/H/S
+const PLAYINGCARD_SUIT_PREFIX: Array[String] = ["D", "C", "H", "S"]
 
 
 static func is_joker(card_id: int) -> bool:
@@ -12,7 +13,7 @@ static func is_joker(card_id: int) -> bool:
 
 static func suit_of(card_id: int) -> int:
 	if card_id < 52:
-		return int(card_id / RANKS_PER_SUIT)
+		return int(card_id / float(RANKS_PER_SUIT))
 	return -1
 
 
@@ -28,40 +29,39 @@ static func ddz_rank_value(card_id: int) -> int:
 	return card_id % RANKS_PER_SUIT
 
 
-static func rank_to_filename_suffix(rank: int) -> String:
+## `rank_of` 为斗地主顺序：0=3 … 7=10, 8=J, 9=Q, 10=K, 11=A, 12=2 → 资源编号 1–13（A=1, 2=2, 3–10, J=11, Q=12, K=13）
+static func rank_to_playingcard_asset_num(rank: int) -> int:
 	if rank >= 0 and rank <= 7:
-		return str(3 + rank)
+		return rank + 3
 	if rank == 8:
-		return "J"
+		return 11
 	if rank == 9:
-		return "Q"
+		return 12
 	if rank == 10:
-		return "K"
+		return 13
 	if rank == 11:
-		return "ACE"
+		return 1
 	if rank == 12:
-		return "2"
-	return ""
+		return 2
+	return 1
 
 
-static func texture_path_back(which: int = 1) -> String:
-	var w: int = clampi(which, 1, 5)
-	return "res://CardsAssets/Back_%d.png" % w
+static func texture_path_back(_which: int = 1) -> String:
+	return "res://assets/playingcards/Back-B.png"
 
 
 static func texture_path_for(card_id: int) -> String:
 	if card_id < 0 or card_id >= COUNT:
 		push_error("Invalid card_id: %s" % card_id)
 		return ""
-	# 52=小王 53=大王；资源文件名与牌面约定相反时在此对调贴图
 	if card_id == 52:
-		return "res://CardsAssets/Joker_2.png"
+		return "res://assets/playingcards/X-B.png"
 	if card_id == 53:
-		return "res://CardsAssets/Joker_1.png"
+		return "res://assets/playingcards/X-R.png"
 	var suit: int = suit_of(card_id)
 	var rank: int = rank_of(card_id)
-	var suf: String = rank_to_filename_suffix(rank)
-	return "res://CardsAssets/%s_%s.png" % [SUIT_NAMES[suit], suf]
+	var num: int = rank_to_playingcard_asset_num(rank)
+	return "res://assets/playingcards/%s-%d.png" % [PLAYINGCARD_SUIT_PREFIX[suit], num]
 
 
 static func make_full_deck() -> PackedInt32Array:

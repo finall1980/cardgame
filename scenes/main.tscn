@@ -1,7 +1,141 @@
-[gd_scene format=3 uid="uid://bqj8maindd001"]
+[gd_scene load_steps=12 format=3 uid="uid://bqj8maindd001"]
 
 [ext_resource type="Script" uid="uid://648yv8ut41qu" path="res://scripts/main.gd" id="1"]
 [ext_resource type="AudioStream" path="res://MusicAssets/BGM2.mp3" id="2_bgm2"]
+[ext_resource type="Shader" path="res://shaders/avatar_circle.gdshader" id="3_avatar_shader"]
+
+[sub_resource type="StyleBoxFlat" id="SettlePanel_style"]
+bg_color = Color(0.07, 0.14, 0.11, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.42, 0.72, 0.52, 0.85)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+content_margin_left = 20.0
+content_margin_top = 18.0
+content_margin_right = 20.0
+content_margin_bottom = 18.0
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="SettleBtn_style"]
+bg_color = Color(0.22, 0.48, 0.32, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.85, 0.62, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="PhasePanel_style"]
+bg_color = Color(0.05, 0.14, 0.1, 0.82)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.68, 0.52, 0.55)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 16.0
+content_margin_top = 14.0
+content_margin_right = 16.0
+content_margin_bottom = 14.0
+shadow_color = Color(0, 0, 0, 0.25)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="LogPanel_style"]
+bg_color = Color(0.04, 0.12, 0.085, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.38, 0.62, 0.48, 0.5)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+shadow_color = Color(0, 0, 0, 0.22)
+shadow_size = 3
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="SettingsPanel_style"]
+bg_color = Color(0.05, 0.13, 0.09, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.68, 0.52, 0.65)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+shadow_color = Color(0, 0, 0, 0.28)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="HSliderTrack_style"]
+bg_color = Color(0.1, 0.2, 0.14, 1)
+corner_radius = 4
+content_margin_left = 4
+content_margin_top = 4
+content_margin_right = 4
+content_margin_bottom = 4
+
+[sub_resource type="StyleBoxFlat" id="HSliderGrabber_style"]
+bg_color = Color(0.48, 0.78, 0.58, 1)
+corner_radius = 6
+content_margin_left = 6
+content_margin_top = 4
+content_margin_right = 6
+content_margin_bottom = 4
+
+[sub_resource type="ShaderMaterial" id="AvatarCircle_mat"]
+shader = ExtResource("3_avatar_shader")
+shader_parameter/ring_band = 0.048
+shader_parameter/ring_inner = Color(1, 0.88, 0.38, 1)
+shader_parameter/ring_outer = Color(0.25, 0.82, 0.72, 1)
+
+[sub_resource type="StyleBoxFlat" id="PlayBtn_style"]
+bg_color = Color(0.19, 0.44, 0.29, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.48, 0.78, 0.55, 0.92)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+content_margin_left = 12.0
+content_margin_top = 7.0
+content_margin_right = 12.0
+content_margin_bottom = 7.0
+shadow_color = Color(0, 0, 0, 0.28)
+shadow_size = 3
+shadow_offset = Vector2(0, 2)
 
 [node name="Main" type="Control" unique_id=1532765505]
 layout_mode = 3
@@ -39,7 +173,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 12.0
-offset_top = 8.0
+offset_top = 20.0
 offset_right = -12.0
 offset_bottom = -20.0
 grow_horizontal = 2
@@ -47,39 +181,63 @@ grow_vertical = 2
 theme_override_constants/separation = 6
 clip_contents = false
 
-[node name="ScoreStrip" type="Label" parent="RootVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.82, 0.95, 0.88, 1)
-text = "对局 · 猫草积分见各座位头像旁"
-
-[node name="MainHBox" type="HBoxContainer" parent="RootVBox"]
+[node name="MidFill" type="VBoxContainer" parent="RootVBox"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 10
+theme_override_constants/separation = 0
 
-[node name="LeftOpp" type="VBoxContainer" parent="RootVBox/MainHBox"]
+[node name="MarginMain" type="MarginContainer" parent="RootVBox/MidFill"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 168
+theme_override_constants/margin_right = 168
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="LeftOppContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 20.0
+offset_right = 180.0
+offset_bottom = -20.0
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CenterLeft" type="CenterContainer" parent="LeftOppContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="LeftOpp" type="VBoxContainer" parent="LeftOppContainer/CenterLeft"]
 layout_mode = 2
 size_flags_horizontal = 2
 custom_minimum_size = Vector2(118, 0)
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="SeatRowP2" type="HBoxContainer" parent="RootVBox/MainHBox/LeftOpp"]
+[node name="SeatRowP2" type="HBoxContainer" parent="LeftOppContainer/CenterLeft/LeftOpp"]
 layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 6
 
-[node name="AvatarP2" type="TextureRect" parent="RootVBox/MainHBox/LeftOpp/SeatRowP2"]
+[node name="AvatarP2" type="TextureRect" parent="LeftOppContainer/CenterLeft/LeftOpp/SeatRowP2"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(72, 72)
+material = SubResource("AvatarCircle_mat")
+custom_minimum_size = Vector2(78, 78)
 layout_mode = 2
 expand_mode = 3
 stretch_mode = 5
 
-[node name="LandlordBadgeP2" type="Label" parent="RootVBox/MainHBox/LeftOpp/SeatRowP2"]
+[node name="LandlordBadgeP2" type="Label" parent="LeftOppContainer/CenterLeft/LeftOpp/SeatRowP2"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -89,7 +247,7 @@ theme_override_colors/font_color = Color(1, 0.82, 0.25, 1)
 text = "地"
 tooltip_text = "地主"
 
-[node name="MaocaoVal2" type="Label" parent="RootVBox/MainHBox/LeftOpp/SeatRowP2"]
+[node name="MaocaoVal2" type="Label" parent="LeftOppContainer/CenterLeft/LeftOpp/SeatRowP2"]
 unique_name_in_owner = true
 layout_mode = 2
 vertical_alignment = 1
@@ -97,14 +255,14 @@ theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.95, 0.98, 0.88, 1)
 text = "5000"
 
-[node name="MaocaoGrass2" type="Label" parent="RootVBox/MainHBox/LeftOpp/SeatRowP2"]
+[node name="MaocaoGrass2" type="Label" parent="LeftOppContainer/CenterLeft/LeftOpp/SeatRowP2"]
 layout_mode = 2
 vertical_alignment = 1
 theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.55, 0.88, 0.45, 1)
 text = "🌿"
 
-[node name="LabelP2" type="Label" parent="RootVBox/MainHBox/LeftOpp" unique_id=1597112544]
+[node name="LabelP2" type="Label" parent="LeftOppContainer/CenterLeft/LeftOpp" unique_id=1597112544]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
@@ -112,13 +270,13 @@ theme_override_colors/font_color = Color(0.95, 0.88, 0.65, 1)
 theme_override_font_sizes/font_size = 14
 text = "丑丑妹"
 
-[node name="OppP2" type="HBoxContainer" parent="RootVBox/MainHBox/LeftOpp" unique_id=2002086994]
+[node name="OppP2" type="HBoxContainer" parent="LeftOppContainer/CenterLeft/LeftOpp" unique_id=2002086994]
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 theme_override_constants/separation = -16
 
-[node name="OppLbl2" type="Label" parent="RootVBox/MainHBox/LeftOpp" unique_id=1142406087]
+[node name="OppLbl2" type="Label" parent="LeftOppContainer/CenterLeft/LeftOpp" unique_id=1142406087]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
@@ -126,99 +284,150 @@ theme_override_colors/font_color = Color(0.78, 0.92, 0.85, 1)
 theme_override_font_sizes/font_size = 12
 text = "17张"
 
-[node name="CenterCol" type="VBoxContainer" parent="RootVBox/MainHBox"]
+[node name="CenterCol" type="VBoxContainer" parent="RootVBox/MidFill/MarginMain"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="GameHeaderVBox" type="VBoxContainer" parent="RootVBox/MainHBox/CenterCol"]
+[node name="GameHeaderVBox" type="VBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol"]
 layout_mode = 2
 size_flags_vertical = 0
-theme_override_constants/separation = 5
+theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox" unique_id=719285229]
+[node name="HeaderNarrowCenter" type="CenterContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HeaderNarrowColumn" type="VBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter"]
+layout_mode = 2
+theme_override_constants/separation = 8
+custom_maximum_size = Vector2(480, 0)
+size_flags_horizontal = 4
+
+[node name="PhaseInfoPanel" type="PanelContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("PhasePanel_style")
+
+[node name="PhaseInfoInner" type="VBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/PhaseInfoPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/PhaseInfoPanel/PhaseInfoInner" unique_id=719285229]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.92, 0.96, 0.9, 1)
-theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.96, 0.98, 0.95, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.35)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
 text = "斗地主 · 对局"
 
-[node name="Status" type="Label" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox" unique_id=320701526]
+[node name="Status" type="RichTextLabel" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/PhaseInfoPanel/PhaseInfoInner" unique_id=320701526]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.85, 0.95, 0.88, 1)
-theme_override_font_sizes/font_size = 13
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
 autowrap_mode = 3
+theme_override_colors/default_color = Color(0.88, 0.96, 0.9, 1)
+theme_override_font_sizes/normal_font_size = 13
+text = ""
 
-[node name="BottomLabel" type="Label" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox" unique_id=1570892262]
+[node name="BottomLabel" type="Label" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/PhaseInfoPanel/PhaseInfoInner" unique_id=1570892262]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.9, 0.85, 1)
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.72, 0.88, 0.8, 1)
 theme_override_font_sizes/font_size = 12
 text = "底牌（叫地主后归地主）"
 
-[node name="BottomCards" type="HBoxContainer" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox" unique_id=774540845]
+[node name="BottomCards" type="HBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/PhaseInfoPanel/PhaseInfoInner" unique_id=774540845]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 alignment = 1
 
-[node name="BiddingRow" type="VBoxContainer" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox" unique_id=490359034]
+[node name="BiddingRow" type="VBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn" unique_id=490359034]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="BidHint" type="Label" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/BiddingRow" unique_id=467600083]
+[node name="BidHint" type="Label" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/BiddingRow" unique_id=467600083]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 1
 theme_override_colors/font_color = Color(1, 0.95, 0.75, 1)
 theme_override_font_sizes/font_size = 13
-text = "你的叫分："
+text = "你的叫倍（基础倍率）："
 
-[node name="BidCenter" type="CenterContainer" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/BiddingRow"]
+[node name="BidCenter" type="CenterContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/BiddingRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BidButtonsRow" type="HBoxContainer" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/BiddingRow/BidCenter"]
+[node name="BidButtonsRow" type="HBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/BiddingRow/BidCenter"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="BtnBid0" type="Button" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/BiddingRow/BidCenter/BidButtonsRow" unique_id=2069561673]
+[node name="BtnBid0" type="Button" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/BiddingRow/BidCenter/BidButtonsRow" unique_id=2069561673]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "不叫(0)"
+custom_minimum_size = Vector2(64, 36)
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("SettleBtn_style")
+theme_override_styles/hover = SubResource("SettleBtn_style")
+theme_override_styles/pressed = SubResource("SettleBtn_style")
+text = "不叫"
 
-[node name="BtnBid1" type="Button" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/BiddingRow/BidCenter/BidButtonsRow" unique_id=818593038]
+[node name="BtnBid1" type="Button" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/BiddingRow/BidCenter/BidButtonsRow" unique_id=818593038]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "1分"
+custom_minimum_size = Vector2(64, 36)
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("SettleBtn_style")
+theme_override_styles/hover = SubResource("SettleBtn_style")
+theme_override_styles/pressed = SubResource("SettleBtn_style")
+text = "1倍"
 
-[node name="BtnBid2" type="Button" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/BiddingRow/BidCenter/BidButtonsRow" unique_id=206295800]
+[node name="BtnBid2" type="Button" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/BiddingRow/BidCenter/BidButtonsRow" unique_id=206295800]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "2分"
+custom_minimum_size = Vector2(64, 36)
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("SettleBtn_style")
+theme_override_styles/hover = SubResource("SettleBtn_style")
+theme_override_styles/pressed = SubResource("SettleBtn_style")
+text = "2倍"
 
-[node name="BtnBid3" type="Button" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/BiddingRow/BidCenter/BidButtonsRow" unique_id=695191247]
+[node name="BtnBid3" type="Button" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/BiddingRow/BidCenter/BidButtonsRow" unique_id=695191247]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "3分"
+custom_minimum_size = Vector2(64, 36)
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("SettleBtn_style")
+theme_override_styles/hover = SubResource("SettleBtn_style")
+theme_override_styles/pressed = SubResource("SettleBtn_style")
+text = "3倍"
 
-[node name="RobRow" type="VBoxContainer" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox"]
+[node name="RobRow" type="VBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="RobHint" type="Label" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/RobRow"]
+[node name="RobHint" type="Label" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/RobRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 1
@@ -226,50 +435,62 @@ theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
 theme_override_font_sizes/font_size = 13
 text = "抢地主："
 
-[node name="RobCenter" type="CenterContainer" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/RobRow"]
+[node name="RobCenter" type="CenterContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/RobRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RobButtonsRow" type="HBoxContainer" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/RobRow/RobCenter"]
+[node name="RobButtonsRow" type="HBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/RobRow/RobCenter"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="BtnRobYes" type="Button" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/RobRow/RobCenter/RobButtonsRow"]
+[node name="BtnRobYes" type="Button" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/RobRow/RobCenter/RobButtonsRow"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
+custom_minimum_size = Vector2(100, 38)
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("SettleBtn_style")
+theme_override_styles/hover = SubResource("SettleBtn_style")
+theme_override_styles/pressed = SubResource("SettleBtn_style")
 text = "抢地主"
 
-[node name="BtnRobNo" type="Button" parent="RootVBox/MainHBox/CenterCol/GameHeaderVBox/RobRow/RobCenter/RobButtonsRow"]
+[node name="BtnRobNo" type="Button" parent="RootVBox/MidFill/MarginMain/CenterCol/GameHeaderVBox/HeaderNarrowCenter/HeaderNarrowColumn/RobRow/RobCenter/RobButtonsRow"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
+custom_minimum_size = Vector2(100, 38)
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("SettleBtn_style")
+theme_override_styles/hover = SubResource("SettleBtn_style")
+theme_override_styles/pressed = SubResource("SettleBtn_style")
 text = "不抢"
 
-[node name="PlayTableRoot" type="VBoxContainer" parent="RootVBox/MainHBox/CenterCol"]
+[node name="PlayTableRoot" type="VBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="PlayAreaInner" type="VBoxContainer" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot"]
+[node name="PlayAreaInner" type="VBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot"]
 layout_mode = 2
 size_flags_vertical = 3
-custom_minimum_size = Vector2(0, 120)
+custom_minimum_size = Vector2(0, 150)
 theme_override_constants/separation = 10
 
-[node name="PlayRowTop" type="HBoxContainer" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner"]
+[node name="PlayRowTop" type="HBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="PlayZoneP2" type="VBoxContainer" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop"]
+[node name="PlayZoneP2" type="VBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 alignment = 1
 
-[node name="PlayKindP2" type="Label" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop/PlayZoneP2"]
+[node name="PlayKindP2" type="Label" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop/PlayZoneP2"]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
@@ -277,19 +498,19 @@ theme_override_font_sizes/font_size = 12
 theme_override_colors/font_color = Color(0.92, 0.94, 0.9, 1)
 text = ""
 
-[node name="PlayCardsP2" type="HBoxContainer" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop/PlayZoneP2"]
+[node name="PlayCardsP2" type="HBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop/PlayZoneP2"]
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
-[node name="PlayZoneP1" type="VBoxContainer" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop"]
+[node name="PlayZoneP1" type="VBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 alignment = 1
 
-[node name="PlayKindP1" type="Label" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop/PlayZoneP1"]
+[node name="PlayKindP1" type="Label" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop/PlayZoneP1"]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
@@ -297,29 +518,29 @@ theme_override_font_sizes/font_size = 12
 theme_override_colors/font_color = Color(0.92, 0.94, 0.9, 1)
 text = ""
 
-[node name="PlayCardsP1" type="HBoxContainer" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop/PlayZoneP1"]
+[node name="PlayCardsP1" type="HBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowTop/PlayZoneP1"]
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
-[node name="PlayRowBottom" type="HBoxContainer" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner"]
+[node name="PlayRowBottom" type="HBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner"]
 layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 8
 
-[node name="SpacerPlayL" type="Control" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowBottom"]
+[node name="SpacerPlayL" type="Control" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowBottom"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="PlayZoneP0" type="VBoxContainer" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowBottom"]
+[node name="PlayZoneP0" type="VBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowBottom"]
 layout_mode = 2
 size_flags_horizontal = 0
-custom_minimum_size = Vector2(220, 0)
+custom_minimum_size = Vector2(300, 0)
 theme_override_constants/separation = 4
 alignment = 1
 
-[node name="PlayKindP0" type="Label" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowBottom/PlayZoneP0"]
+[node name="PlayKindP0" type="Label" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowBottom/PlayZoneP0"]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
@@ -327,126 +548,40 @@ theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.92, 0.94, 0.9, 1)
 text = ""
 
-[node name="PlayCardsP0" type="HBoxContainer" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowBottom/PlayZoneP0"]
+[node name="PlayCardsP0" type="HBoxContainer" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowBottom/PlayZoneP0"]
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
-theme_override_constants/separation = 5
+theme_override_constants/separation = 8
 
-[node name="SpacerPlayR" type="Control" parent="RootVBox/MainHBox/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowBottom"]
+[node name="SpacerPlayR" type="Control" parent="RootVBox/MidFill/MarginMain/CenterCol/PlayTableRoot/PlayAreaInner/PlayRowBottom"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RightOpp" type="VBoxContainer" parent="RootVBox/MainHBox"]
-layout_mode = 2
-size_flags_horizontal = 10
-custom_minimum_size = Vector2(118, 0)
-theme_override_constants/separation = 8
-alignment = 1
-
-[node name="SeatRowP1" type="HBoxContainer" parent="RootVBox/MainHBox/RightOpp"]
-layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 6
-
-[node name="AvatarP1" type="TextureRect" parent="RootVBox/MainHBox/RightOpp/SeatRowP1"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(72, 72)
-layout_mode = 2
-expand_mode = 3
-stretch_mode = 5
-
-[node name="LandlordBadgeP1" type="Label" parent="RootVBox/MainHBox/RightOpp/SeatRowP1"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-vertical_alignment = 1
-theme_override_font_sizes/font_size = 15
-theme_override_colors/font_color = Color(1, 0.82, 0.25, 1)
-text = "地"
-tooltip_text = "地主"
-
-[node name="MaocaoVal1" type="Label" parent="RootVBox/MainHBox/RightOpp/SeatRowP1"]
-unique_name_in_owner = true
-layout_mode = 2
-vertical_alignment = 1
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.95, 0.98, 0.88, 1)
-text = "5000"
-
-[node name="MaocaoGrass1" type="Label" parent="RootVBox/MainHBox/RightOpp/SeatRowP1"]
-layout_mode = 2
-vertical_alignment = 1
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.55, 0.88, 0.45, 1)
-text = "🌿"
-
-[node name="LabelP1" type="Label" parent="RootVBox/MainHBox/RightOpp" unique_id=1778520510]
-unique_name_in_owner = true
-layout_mode = 2
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.95, 0.88, 0.65, 1)
-theme_override_font_sizes/font_size = 14
-text = "毛睿睿"
-
-[node name="OppP1" type="HBoxContainer" parent="RootVBox/MainHBox/RightOpp" unique_id=743554148]
-unique_name_in_owner = true
-layout_mode = 2
-alignment = 1
-theme_override_constants/separation = -16
-
-[node name="OppLbl1" type="Label" parent="RootVBox/MainHBox/RightOpp" unique_id=1004765977]
-unique_name_in_owner = true
-layout_mode = 2
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.78, 0.92, 0.85, 1)
-theme_override_font_sizes/font_size = 12
-text = "17张"
-
-[node name="FooterLogRow" type="HBoxContainer" parent="RootVBox"]
+[node name="BottomPlayer" type="VBoxContainer" parent="RootVBox"]
 layout_mode = 2
 size_flags_vertical = 0
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
+alignment = 1
 
-[node name="FooterSpacer" type="Control" parent="RootVBox/FooterLogRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="LogScroll" type="ScrollContainer" parent="RootVBox/FooterLogRow"]
-unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(280, 64)
-horizontal_scroll_mode = 0
-vertical_scroll_mode = 1
-
-[node name="GameLog" type="RichTextLabel" parent="RootVBox/FooterLogRow/LogScroll" unique_id=940024461]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(300, 72)
-theme_override_colors/default_color = Color(0.82, 0.92, 0.86, 1)
-theme_override_font_sizes/normal_font_size = 11
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
-
-[node name="HumanAvatarCenter" type="CenterContainer" parent="RootVBox"]
+[node name="HumanAvatarCenter" type="CenterContainer" parent="RootVBox/BottomPlayer"]
 layout_mode = 2
 size_flags_vertical = 0
 size_flags_horizontal = 3
 
-[node name="HumanSeatRow" type="HBoxContainer" parent="RootVBox/HumanAvatarCenter"]
+[node name="HumanSeatRow" type="HBoxContainer" parent="RootVBox/BottomPlayer/HumanAvatarCenter"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="AvatarP0" type="TextureRect" parent="RootVBox/HumanAvatarCenter/HumanSeatRow"]
+[node name="AvatarP0" type="TextureRect" parent="RootVBox/BottomPlayer/HumanAvatarCenter/HumanSeatRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(72, 72)
+material = SubResource("AvatarCircle_mat")
+custom_minimum_size = Vector2(78, 78)
 layout_mode = 2
 expand_mode = 3
 stretch_mode = 5
 
-[node name="LandlordBadgeP0" type="Label" parent="RootVBox/HumanAvatarCenter/HumanSeatRow"]
+[node name="LandlordBadgeP0" type="Label" parent="RootVBox/BottomPlayer/HumanAvatarCenter/HumanSeatRow"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -456,7 +591,7 @@ theme_override_colors/font_color = Color(1, 0.82, 0.25, 1)
 text = "地"
 tooltip_text = "地主"
 
-[node name="MaocaoVal0" type="Label" parent="RootVBox/HumanAvatarCenter/HumanSeatRow"]
+[node name="MaocaoVal0" type="Label" parent="RootVBox/BottomPlayer/HumanAvatarCenter/HumanSeatRow"]
 unique_name_in_owner = true
 layout_mode = 2
 vertical_alignment = 1
@@ -464,14 +599,14 @@ theme_override_font_sizes/font_size = 15
 theme_override_colors/font_color = Color(0.98, 0.95, 0.78, 1)
 text = "5000"
 
-[node name="MaocaoGrass0" type="Label" parent="RootVBox/HumanAvatarCenter/HumanSeatRow"]
+[node name="MaocaoGrass0" type="Label" parent="RootVBox/BottomPlayer/HumanAvatarCenter/HumanSeatRow"]
 layout_mode = 2
 vertical_alignment = 1
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.55, 0.88, 0.45, 1)
 text = "🌿"
 
-[node name="LabelP0" type="Label" parent="RootVBox" unique_id=739234640]
+[node name="LabelP0" type="Label" parent="RootVBox/BottomPlayer" unique_id=739234640]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.75, 1)
@@ -479,58 +614,212 @@ theme_override_font_sizes/font_size = 16
 text = "咪宝"
 horizontal_alignment = 1
 
-[node name="HandCenter" type="CenterContainer" parent="RootVBox" unique_id=200350711]
+[node name="HandCenter" type="CenterContainer" parent="RootVBox/BottomPlayer" unique_id=200350711]
 layout_mode = 2
 size_flags_vertical = 0
 size_flags_horizontal = 3
 
-[node name="HandRow" type="Control" parent="RootVBox/HandCenter" unique_id=1758114189]
+[node name="HandRow" type="Control" parent="RootVBox/BottomPlayer/HandCenter" unique_id=1758114189]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(400, 88)
+custom_minimum_size = Vector2(570, 128)
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="BtnRow" type="HBoxContainer" parent="RootVBox" unique_id=1750251276]
+[node name="BtnRow" type="HBoxContainer" parent="RootVBox/BottomPlayer" unique_id=1750251276]
 layout_mode = 2
 size_flags_vertical = 0
-theme_override_constants/separation = 16
+theme_override_constants/separation = 12
 alignment = 1
 
-[node name="BtnPlay" type="Button" parent="RootVBox/BtnRow" unique_id=54138205]
+[node name="BtnPlay" type="Button" parent="RootVBox/BottomPlayer/BtnRow" unique_id=54138205]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(132, 54)
-theme_override_font_sizes/font_size = 22
+custom_minimum_size = Vector2(108, 42)
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("PlayBtn_style")
+theme_override_styles/hover = SubResource("PlayBtn_style")
+theme_override_styles/pressed = SubResource("PlayBtn_style")
 text = "出牌"
 
-[node name="BtnHint" type="Button" parent="RootVBox/BtnRow"]
+[node name="BtnHint" type="Button" parent="RootVBox/BottomPlayer/BtnRow"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(132, 54)
-theme_override_font_sizes/font_size = 22
+custom_minimum_size = Vector2(108, 42)
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("PlayBtn_style")
+theme_override_styles/hover = SubResource("PlayBtn_style")
+theme_override_styles/pressed = SubResource("PlayBtn_style")
 text = "提示"
 
-[node name="BtnPass" type="Button" parent="RootVBox/BtnRow" unique_id=901923973]
+[node name="BtnPass" type="Button" parent="RootVBox/BottomPlayer/BtnRow" unique_id=901923973]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(132, 54)
-theme_override_font_sizes/font_size = 22
+custom_minimum_size = Vector2(108, 42)
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("PlayBtn_style")
+theme_override_styles/hover = SubResource("PlayBtn_style")
+theme_override_styles/pressed = SubResource("PlayBtn_style")
 text = "过"
 
-[node name="BtnNew" type="Button" parent="RootVBox/BtnRow" unique_id=2008234857]
+[node name="BtnNew" type="Button" parent="RootVBox/BottomPlayer/BtnRow" unique_id=2008234857]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(152, 54)
-theme_override_font_sizes/font_size = 22
+custom_minimum_size = Vector2(128, 42)
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("PlayBtn_style")
+theme_override_styles/hover = SubResource("PlayBtn_style")
+theme_override_styles/pressed = SubResource("PlayBtn_style")
 text = "重新发牌"
 
-[node name="BtnBackMenu" type="Button" parent="RootVBox/BtnRow" unique_id=429330448]
+[node name="BtnBackMenu" type="Button" parent="RootVBox/BottomPlayer/BtnRow" unique_id=429330448]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-custom_minimum_size = Vector2(168, 54)
-theme_override_font_sizes/font_size = 22
+custom_minimum_size = Vector2(142, 42)
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("PlayBtn_style")
+theme_override_styles/hover = SubResource("PlayBtn_style")
+theme_override_styles/pressed = SubResource("PlayBtn_style")
 text = "返回开始菜单"
+
+[node name="RightOppContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -180.0
+offset_top = 20.0
+offset_right = -12.0
+offset_bottom = -20.0
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CenterRight" type="CenterContainer" parent="RightOppContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="RightOpp" type="VBoxContainer" parent="RightOppContainer/CenterRight"]
+layout_mode = 2
+size_flags_horizontal = 10
+custom_minimum_size = Vector2(118, 0)
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="SeatRowP1" type="HBoxContainer" parent="RightOppContainer/CenterRight/RightOpp"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 6
+
+[node name="AvatarP1" type="TextureRect" parent="RightOppContainer/CenterRight/RightOpp/SeatRowP1"]
+unique_name_in_owner = true
+material = SubResource("AvatarCircle_mat")
+custom_minimum_size = Vector2(78, 78)
+layout_mode = 2
+expand_mode = 3
+stretch_mode = 5
+
+[node name="LandlordBadgeP1" type="Label" parent="RightOppContainer/CenterRight/RightOpp/SeatRowP1"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(1, 0.82, 0.25, 1)
+text = "地"
+tooltip_text = "地主"
+
+[node name="MaocaoVal1" type="Label" parent="RightOppContainer/CenterRight/RightOpp/SeatRowP1"]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.95, 0.98, 0.88, 1)
+text = "5000"
+
+[node name="MaocaoGrass1" type="Label" parent="RightOppContainer/CenterRight/RightOpp/SeatRowP1"]
+layout_mode = 2
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.55, 0.88, 0.45, 1)
+text = "🌿"
+
+[node name="LabelP1" type="Label" parent="RightOppContainer/CenterRight/RightOpp" unique_id=1778520510]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.95, 0.88, 0.65, 1)
+theme_override_font_sizes/font_size = 14
+text = "毛睿睿"
+
+[node name="OppP1" type="HBoxContainer" parent="RightOppContainer/CenterRight/RightOpp" unique_id=743554148]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = -16
+
+[node name="OppLbl1" type="Label" parent="RightOppContainer/CenterRight/RightOpp" unique_id=1004765977]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.78, 0.92, 0.85, 1)
+theme_override_font_sizes/font_size = 12
+text = "17张"
+
+[node name="LogDock" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -252.0
+offset_top = -264.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 0
+z_index = 4
+custom_minimum_size = Vector2(228, 240)
+custom_maximum_size = Vector2(240, 680)
+theme_override_styles/panel = SubResource("LogPanel_style")
+
+[node name="LogScroll" type="ScrollContainer" parent="LogDock"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="GameLog" type="RichTextLabel" parent="LogDock/LogScroll" unique_id=940024461]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(198, 192)
+theme_override_colors/default_color = Color(0.86, 0.94, 0.89, 1)
+theme_override_font_sizes/normal_font_size = 12
+theme_override_constants/line_separation = 8
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 3
 
 [node name="DealLayer" type="CanvasLayer" parent="." unique_id=1404299851]
 unique_name_in_owner = true
@@ -592,10 +881,88 @@ horizontal_alignment = 1
 
 [node name="SfxPlayer" type="AudioStreamPlayer" parent="." unique_id=149372463]
 
+[node name="SfxBombPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+volume_db = -2.0
+bus = &"Master"
+
+[node name="BgmChromeLayer" type="CanvasLayer" parent="."]
+layer = 25
+
+[node name="SettingsRoot" type="Control" parent="BgmChromeLayer"]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -268.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 118.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="SettingsPanel" type="PanelContainer" parent="BgmChromeLayer/SettingsRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("SettingsPanel_style")
+
+[node name="SettingsInner" type="VBoxContainer" parent="BgmChromeLayer/SettingsRoot/SettingsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SettingsTitle" type="Label" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.94, 0.98, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.35)
+text = "设置"
+
+[node name="MusicRow" type="HBoxContainer" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="BgmVolLbl" type="Label" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner/MusicRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.94, 0.88, 1)
+theme_override_font_sizes/font_size = 12
+text = "音乐"
+
+[node name="BgmVolumeSlider" type="HSlider" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner/MusicRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 28)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 100.0
+step = 1.0
+value = 60.0
+theme_override_colors/grabber_highlight_color = Color(0.75, 0.95, 0.82, 1)
+theme_override_styles/slider = SubResource("HSliderTrack_style")
+theme_override_styles/grabber_area = SubResource("HSliderGrabber_style")
+theme_override_styles/grabber_area_highlight = SubResource("HSliderGrabber_style")
+
+[node name="BgmVolumeValue" type="Label" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner/MusicRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.98, 0.92, 1)
+theme_override_font_sizes/font_size = 12
+text = "60%"
+horizontal_alignment = 2
+
 [node name="BgmPlayer" type="AudioStreamPlayer" parent="."]
 unique_name_in_owner = true
 stream = ExtResource("2_bgm2")
-volume_db = -8.0
 bus = &"Master"
 
 [node name="SettlementLayer" type="CanvasLayer" parent="."]
@@ -617,7 +984,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.05, 0.04, 0.78)
+color = Color(0.03, 0.08, 0.06, 0.72)
 
 [node name="SettlePanel" type="PanelContainer" parent="SettlementLayer/SettleOverlay"]
 layout_mode = 1
@@ -626,43 +993,65 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -240.0
-offset_top = -175.0
-offset_right = 240.0
-offset_bottom = 175.0
+offset_left = -268.0
+offset_top = -210.0
+offset_right = 268.0
+offset_bottom = 210.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("SettlePanel_style")
 
 [node name="SettleVBox" type="VBoxContainer" parent="SettlementLayer/SettleOverlay/SettlePanel"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 12
 
 [node name="SettleTitle" type="Label" parent="SettlementLayer/SettleOverlay/SettlePanel/SettleVBox"]
 layout_mode = 2
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(0.95, 0.92, 0.78, 1)
+theme_override_colors/font_color = Color(0.98, 0.94, 0.78, 1)
+theme_override_font_sizes/font_size = 26
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.45)
 text = "本局结算"
 
-[node name="SettleBody" type="Label" parent="SettlementLayer/SettleOverlay/SettlePanel/SettleVBox"]
+[node name="SettleBody" type="RichTextLabel" parent="SettlementLayer/SettleOverlay/SettlePanel/SettleVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.88, 0.95, 0.9, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_colors/default_color = Color(0.9, 0.96, 0.91, 1)
+theme_override_font_sizes/normal_font_size = 14
+theme_override_font_sizes/bold_font_size = 15
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
 autowrap_mode = 3
 
 [node name="SettleBtnRow" type="HBoxContainer" parent="SettlementLayer/SettleOverlay/SettlePanel/SettleVBox"]
 layout_mode = 2
 alignment = 1
-theme_override_constants/separation = 16
+theme_override_constants/separation = 20
 
 [node name="BtnSettleContinue" type="Button" parent="SettlementLayer/SettleOverlay/SettlePanel/SettleVBox/SettleBtnRow"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("SettleBtn_style")
+theme_override_styles/hover = SubResource("SettleBtn_style")
+theme_override_styles/pressed = SubResource("SettleBtn_style")
 text = "继续游戏"
 
 [node name="BtnSettleMenu" type="Button" parent="SettlementLayer/SettleOverlay/SettlePanel/SettleVBox/SettleBtnRow"]
 unique_name_in_owner = true
 visible = false
+custom_minimum_size = Vector2(160, 40)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("SettleBtn_style")
+theme_override_styles/hover = SubResource("SettleBtn_style")
+theme_override_styles/pressed = SubResource("SettleBtn_style")
 text = "返回开始菜单"

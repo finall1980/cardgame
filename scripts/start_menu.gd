@@ -6,6 +6,7 @@ extends Control
 func _ready() -> void:
 	if _bgm.stream is AudioStreamMP3:
 		(_bgm.stream as AudioStreamMP3).loop = true
+	_bgm.volume_db = linear_to_db(0.6)
 	_bgm.play()
 	%StartBtn.pressed.connect(_on_start_pressed)
 

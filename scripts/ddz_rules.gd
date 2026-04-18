@@ -62,8 +62,8 @@ static func classify(cards: Array) -> Dictionary:
 		if vals.size() == 1 and vals[0] == 4:
 			return {"kind": Kind.BOMB, "main": keys[0], "extra": null}
 		if _is_triple_single(counts):
-			var tr: int = _triple_rank_in(counts)
-			return {"kind": Kind.TRIPLE_WITH_SINGLE, "main": tr, "extra": 4}
+			var triple_rank: int = _triple_rank_in(counts)
+			return {"kind": Kind.TRIPLE_WITH_SINGLE, "main": triple_rank, "extra": 4}
 		return {"kind": Kind.INVALID, "main": -1, "extra": null}
 
 	if n == 5:

@@ -69,10 +69,14 @@ CardGame/
 - 猫咪 id：**丑丑妹(0)、咪宝(1)、毛睿睿(2)**，与 `CAT_NAMES`、头像一致；AI 行为与 **`style_from_cat_id`** 绑定：  
   **普通 / 凶**（咪宝）** / 怂**（毛睿睿）。
 
-### 3.5 猫草与倍数
+### 3.5 猫草与倍率
 
 - 初始猫草 **5000**（`SCORE_START`）；结算按地主胜/负与农民胜/负规则增减（见 `main.gd` 常量）。
-- **`_round_multiplier`**：抢地主每次 ×2；出牌中 **炸弹 ×2**、**王炸 ×4**，可累乘。
+- **最终倍率** = **基础倍率（叫地主）** × **抢地主倍率** × **出牌加翻**（炸弹/王炸）。  
+  - 叫地主选项为 **不叫 / 1倍 / 2倍 / 3倍**：三家都不叫时基础倍率为 **×1**；否则取本轮 **最高叫倍**（1～3）作为 `_mult_base`。  
+  - 抢地主：每次抢 ×2，累乘为 `_mult_rob`。  
+  - 出牌：炸弹每次 ×2、王炸每次 ×4，累乘为 `_mult_play`。  
+  - 结算界面展示 **×基础 × 抢 × 出牌** 的明细与最终乘积。
 
 ---
 
@@ -100,7 +104,7 @@ CardGame/
 
 ## 7. 对局状态机（`main.gd` 摘要）
 
-- 核心变量：`_hands`、`_turn`、`_last`、`_last_player`、`_passes`、`_winner`、`_landlord`、`_seat_cat`、`_round_multiplier`、`_match_round_index` 等。
+- 核心变量：`_hands`、`_turn`、`_last`、`_last_player`、`_passes`、`_winner`、`_landlord`、`_seat_cat`、`_mult_base` / `_mult_rob` / `_mult_play`、`_round_multiplier`（三者之积）、`_match_round_index` 等。
 - 人类出牌：`Rules.classify` + `Rules.beats`；**提示**按钮按当前座位猫咪档位调用 `DdzAi.find_free_lead` / `find_follow` 预选牌。
 - **出牌动画**：`PlayAnimLayer` 上从手牌区/对手区飞向出牌区，落地后写入 `PlayCardsP*`；通过 **display/pending 签名** 避免仅「过」触发的重复刷新再次播动画。
 
@@ -108,7 +112,7 @@ CardGame/
 
 ## 8. AI（`ddz_ai.gd` + `ddz_ai_play.gd`）
 
-- 叫分/抢地主：基于 `hand_landlord_strength` 与档位阈值。
+- 叫倍/抢地主：基于 `hand_landlord_strength` 与档位阈值（仍输出 0～3，对应不叫与 1～3 倍基础）。
 - 首家出牌顺序随 `ai_style`（凶/普通/怂）变化。
 - 跟牌：农民配合、同型最小压、炸弹/王炸、省炸启发式。
 

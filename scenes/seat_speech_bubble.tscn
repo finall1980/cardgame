@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8seatspchbubble"]
+
+[ext_resource type="Script" path="res://scripts/seat_speech_bubble.gd" id="1"]
+
+[node name="SeatSpeechBubble" type="Control"]
+custom_minimum_size = Vector2(100, 40)
+mouse_filter = 2
+z_index = 12
+script = ExtResource("1")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 32.0
+mouse_filter = 2
+z_index = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.08, 0.08, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0.98, 0.98, 0.98, 0.35)
+theme_override_constants/outline_size = 1
+autowrap_mode = 2

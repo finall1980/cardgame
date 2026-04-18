@@ -1,0 +1,17 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://bqj8themeui001"]
+
+[ext_resource type="FontFile" uid="uid://4sid5y6emc6q" path="res://assets/fonts/NotoSansSC-400.ttf" id="1_r"]
+[ext_resource type="FontFile" uid="uid://mey7b1afmqr1" path="res://assets/fonts/NotoSansSC-700.ttf" id="2_b"]
+
+[resource]
+default_font = ExtResource("1_r")
+default_font_size = 16
+Button/fonts/font = ExtResource("1_r")
+Label/fonts/font = ExtResource("1_r")
+LineEdit/fonts/font = ExtResource("1_r")
+RichTextLabel/fonts/normal_font = ExtResource("1_r")
+RichTextLabel/fonts/bold_font = ExtResource("2_b")
+TabBar/fonts/font = ExtResource("1_r")
+ItemList/fonts/font = ExtResource("1_r")
+Tree/fonts/font = ExtResource("1_r")
+TextEdit/fonts/font = ExtResource("1_r")

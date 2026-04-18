@@ -1,8 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://bqj8maindd001"]
+[gd_scene load_steps=14 format=3 uid="uid://bqj8maindd001"]
 
 [ext_resource type="Script" uid="uid://648yv8ut41qu" path="res://scripts/main.gd" id="1"]
 [ext_resource type="AudioStream" path="res://MusicAssets/BGM2.mp3" id="2_bgm2"]
 [ext_resource type="Shader" path="res://shaders/avatar_circle.gdshader" id="3_avatar_shader"]
+[ext_resource type="Texture2D" path="res://CardsAssets/cardbg.png" id="4_cardbg"]
 
 [sub_resource type="StyleBoxFlat" id="SettlePanel_style"]
 bg_color = Color(0.07, 0.14, 0.11, 0.96)
@@ -84,17 +85,33 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.42, 0.68, 0.52, 0.65)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-content_margin_left = 12.0
-content_margin_top = 10.0
-content_margin_right = 12.0
-content_margin_bottom = 10.0
-shadow_color = Color(0, 0, 0, 0.28)
-shadow_size = 4
-shadow_offset = Vector2(0, 2)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 6.0
+content_margin_top = 5.0
+content_margin_right = 6.0
+content_margin_bottom = 5.0
+shadow_color = Color(0, 0, 0, 0.22)
+shadow_size = 2
+shadow_offset = Vector2(0, 1)
+
+[sub_resource type="StyleBoxFlat" id="SettingsBtn_style"]
+bg_color = Color(0.22, 0.48, 0.32, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.85, 0.62, 0.9)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+content_margin_left = 8.0
+content_margin_top = 3.0
+content_margin_right = 8.0
+content_margin_bottom = 3.0
 
 [sub_resource type="StyleBoxFlat" id="HSliderTrack_style"]
 bg_color = Color(0.1, 0.2, 0.14, 1)
@@ -146,14 +163,17 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="Bg" type="ColorRect" parent="." unique_id=391937495]
+[node name="Bg" type="TextureRect" parent="." unique_id=391937495]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.1, 0.32, 0.2, 1)
+mouse_filter = 2
+texture = ExtResource("4_cardbg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="PlayAnimLayer" type="CanvasLayer" parent="."]
 layer = 30
@@ -628,25 +648,13 @@ size_flags_vertical = 0
 [node name="BtnRow" type="HBoxContainer" parent="RootVBox/BottomPlayer" unique_id=1750251276]
 layout_mode = 2
 size_flags_vertical = 0
-theme_override_constants/separation = 12
+theme_override_constants/separation = 20
 alignment = 1
-
-[node name="BtnPlay" type="Button" parent="RootVBox/BottomPlayer/BtnRow" unique_id=54138205]
-unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(108, 42)
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("PlayBtn_style")
-theme_override_styles/hover = SubResource("PlayBtn_style")
-theme_override_styles/pressed = SubResource("PlayBtn_style")
-text = "出牌"
 
 [node name="BtnHint" type="Button" parent="RootVBox/BottomPlayer/BtnRow"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(108, 42)
+custom_minimum_size = Vector2(120, 44)
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
@@ -655,10 +663,22 @@ theme_override_styles/hover = SubResource("PlayBtn_style")
 theme_override_styles/pressed = SubResource("PlayBtn_style")
 text = "提示"
 
+[node name="BtnPlay" type="Button" parent="RootVBox/BottomPlayer/BtnRow" unique_id=54138205]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(128, 44)
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("PlayBtn_style")
+theme_override_styles/hover = SubResource("PlayBtn_style")
+theme_override_styles/pressed = SubResource("PlayBtn_style")
+text = "出牌"
+
 [node name="BtnPass" type="Button" parent="RootVBox/BottomPlayer/BtnRow" unique_id=901923973]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(108, 42)
+custom_minimum_size = Vector2(120, 44)
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
@@ -666,31 +686,6 @@ theme_override_styles/normal = SubResource("PlayBtn_style")
 theme_override_styles/hover = SubResource("PlayBtn_style")
 theme_override_styles/pressed = SubResource("PlayBtn_style")
 text = "过"
-
-[node name="BtnNew" type="Button" parent="RootVBox/BottomPlayer/BtnRow" unique_id=2008234857]
-unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(128, 42)
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("PlayBtn_style")
-theme_override_styles/hover = SubResource("PlayBtn_style")
-theme_override_styles/pressed = SubResource("PlayBtn_style")
-text = "重新发牌"
-
-[node name="BtnBackMenu" type="Button" parent="RootVBox/BottomPlayer/BtnRow" unique_id=429330448]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-custom_minimum_size = Vector2(142, 42)
-theme_override_font_sizes/font_size = 17
-theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("PlayBtn_style")
-theme_override_styles/hover = SubResource("PlayBtn_style")
-theme_override_styles/pressed = SubResource("PlayBtn_style")
-text = "返回开始菜单"
 
 [node name="RightOppContainer" type="Control" parent="."]
 layout_mode = 1
@@ -896,10 +891,10 @@ anchor_left = 1.0
 anchor_top = 0.0
 anchor_right = 1.0
 anchor_bottom = 0.0
-offset_left = -268.0
+offset_left = -139.0
 offset_top = 10.0
 offset_right = -10.0
-offset_bottom = 118.0
+offset_bottom = 145.0
 grow_horizontal = 0
 grow_vertical = 0
 
@@ -914,13 +909,13 @@ theme_override_styles/panel = SubResource("SettingsPanel_style")
 
 [node name="SettingsInner" type="VBoxContainer" parent="BgmChromeLayer/SettingsRoot/SettingsPanel"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 5
 
 [node name="SettingsTitle" type="Label" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner"]
 layout_mode = 2
 horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.94, 0.98, 0.95, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 11
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.35)
@@ -928,18 +923,18 @@ text = "设置"
 
 [node name="MusicRow" type="HBoxContainer" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 5
 alignment = 1
 
 [node name="BgmVolLbl" type="Label" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner/MusicRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.82, 0.94, 0.88, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 10
 text = "音乐"
 
 [node name="BgmVolumeSlider" type="HSlider" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner/MusicRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 28)
+custom_minimum_size = Vector2(56, 16)
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 0.0
@@ -953,12 +948,40 @@ theme_override_styles/grabber_area_highlight = SubResource("HSliderGrabber_style
 
 [node name="BgmVolumeValue" type="Label" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner/MusicRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
+custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.98, 0.92, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 10
 text = "60%"
 horizontal_alignment = 2
+
+[node name="SettingsActions" type="VBoxContainer" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BtnSettingsRedeal" type="Button" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner/SettingsActions"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 22)
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("SettingsBtn_style")
+theme_override_styles/hover = SubResource("SettingsBtn_style")
+theme_override_styles/pressed = SubResource("SettingsBtn_style")
+text = "重新发牌"
+
+[node name="BtnSettingsToMenu" type="Button" parent="BgmChromeLayer/SettingsRoot/SettingsPanel/SettingsInner/SettingsActions"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 22)
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.96, 0.98, 0.94, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("SettingsBtn_style")
+theme_override_styles/hover = SubResource("SettingsBtn_style")
+theme_override_styles/pressed = SubResource("SettingsBtn_style")
+text = "返回开始界面"
 
 [node name="BgmPlayer" type="AudioStreamPlayer" parent="."]
 unique_name_in_owner = true

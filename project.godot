@@ -22,3 +22,12 @@ config/features=PackedStringArray("4.6", "Forward Plus")
 
 window/size/viewport_height=780
 window/stretch/mode="canvas_items"
+
+[gui]
+
+theme/custom="res://theme/game_theme.tres"
+theme/default_font_antialiasing=1
+
+[rendering]
+
+textures/vram_compression/import_etc2_astc=true

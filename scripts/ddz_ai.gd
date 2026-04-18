@@ -222,7 +222,9 @@ static func _try_same_pattern(hand: PackedInt32Array, b: Dictionary, last: Dicti
 		Rules.Kind.FOUR_WITH_TWO:
 			return _follow_four_with_two(b, int(last.get("main", -1)), int(last.get("extra", 0)))
 		Rules.Kind.PLANE:
-			return _follow_plane_bruteforce(hand, int(last.get("main", -1)))
+			return _follow_plane_pure(b, int(last.get("main", -1)), int(last.get("extra", 0)))
+		Rules.Kind.PLANE_WITH_WINGS:
+			return _follow_plane_with_wings(b, int(last.get("main", -1)), int(last.get("extra", 0)))
 		Rules.Kind.BOMB:
 			return []
 	return []
@@ -365,7 +367,7 @@ static func _follow_four_with_two(b: Dictionary, need_four_gt: int, extra: int) 
 static func _pick_two_singles_except(b2: Dictionary, fr: int) -> Array:
 	var out: Array = []
 	for r in range(15):
-		if r == fr:
+		if r == fr or r >= 13:
 			continue
 		var a: Array = b2.get(r, []) as Array
 		if a.size() >= 1:
@@ -377,7 +379,7 @@ static func _pick_two_singles_except(b2: Dictionary, fr: int) -> Array:
 
 static func _pick_two_pairs_except(b2: Dictionary, fr: int) -> Array:
 	var out: Array = []
-	for r in range(15):
+	for r in range(13):
 		if r == fr:
 			continue
 		var a: Array = b2.get(r, []) as Array
@@ -389,31 +391,116 @@ static func _pick_two_pairs_except(b2: Dictionary, fr: int) -> Array:
 	return []
 
 
-static func _follow_plane_bruteforce(hand: PackedInt32Array, need_main_gt: int) -> Array:
-	var ids: Array = []
-	for i in hand.size():
-		ids.append(hand[i])
-	var n: int = ids.size()
-	if n < 10:
+static func _follow_plane_pure(b: Dictionary, need_top_gt: int, k: int) -> Array:
+	if k < 2:
 		return []
-	var idx: Array = []
-	for j in range(10):
-		idx.append(j)
-	while true:
-		var combo: Array = []
-		for j in range(10):
-			combo.append(ids[idx[j]])
-		var pat: Dictionary = Rules.classify(combo)
-		if int(pat.get("kind", 0)) == Rules.Kind.PLANE and int(pat.get("main", -1)) > need_main_gt:
-			return combo
-		var t: int = 9
-		while t >= 0 and idx[t] >= n - 10 + t:
-			t -= 1
-		if t < 0:
+	for top in range(need_top_gt + 1, 12):
+		var st: int = top - k + 1
+		if st < 0:
+			continue
+		var ok := true
+		var out: Array = []
+		for r in range(st, top + 1):
+			if r > 11:
+				ok = false
+				break
+			var arr: Array = b.get(r, []) as Array
+			if arr.size() < 3:
+				ok = false
+				break
+			out.append(arr[0])
+			out.append(arr[1])
+			out.append(arr[2])
+		if ok:
+			return out
+	return []
+
+
+static func _buckets_dup(b: Dictionary) -> Dictionary:
+	var o: Dictionary = {}
+	for kk in b.keys():
+		o[int(kk)] = (b[kk] as Array).duplicate()
+	return o
+
+
+static func _pick_plane_wing_cards(rest: Dictionary, st: int, k: int, need_singles: int, num_pair_wings: int) -> Array:
+	var pairs_left: int = num_pair_wings
+	var singles_left: int = need_singles
+	var taken: Array = []
+	for r in range(0, 13):
+		if r >= st and r <= st + k - 1:
+			continue
+		var arr: Array = rest.get(r, []) as Array
+		while pairs_left > 0 and arr.size() >= 2:
+			taken.append(arr[0])
+			taken.append(arr[1])
+			arr.remove_at(1)
+			arr.remove_at(0)
+			pairs_left -= 1
+			if arr.is_empty():
+				rest.erase(r)
+			else:
+				rest[r] = arr
+		if pairs_left == 0:
 			break
-		idx[t] += 1
-		for j in range(t + 1, 10):
-			idx[j] = idx[j - 1] + 1
+	if pairs_left != 0:
+		return []
+	for r in range(0, 13):
+		if r >= st and r <= st + k - 1:
+			continue
+		var arr2: Array = rest.get(r, []) as Array
+		while singles_left > 0 and arr2.size() >= 1:
+			taken.append(arr2[0])
+			arr2.remove_at(0)
+			singles_left -= 1
+			if arr2.is_empty():
+				rest.erase(r)
+			else:
+				rest[r] = arr2
+		if singles_left == 0:
+			break
+	if singles_left != 0:
+		return []
+	return taken
+
+
+static func _try_plane_wings_combo(b: Dictionary, st: int, k: int, ex: int) -> Array:
+	var num_pair_wings: int = ex & 31
+	var need_singles: int = k - num_pair_wings
+	var rest: Dictionary = _buckets_dup(b)
+	var out: Array = []
+	for r in range(st, st + k):
+		var arr: Array = rest.get(r, []) as Array
+		if arr.size() < 3:
+			return []
+	for r in range(st, st + k):
+		var arr: Array = rest[r] as Array
+		for _i in 3:
+			out.append(arr.pop_front())
+		if arr.is_empty():
+			rest.erase(r)
+		else:
+			rest[r] = arr
+	var wings := _pick_plane_wing_cards(rest, st, k, need_singles, num_pair_wings)
+	if wings.is_empty():
+		return []
+	out.append_array(wings)
+	return out
+
+
+static func _follow_plane_with_wings(b: Dictionary, need_main_gt: int, ex: int) -> Array:
+	var k: int = ex >> 5
+	if k < 2:
+		return []
+	for top in range(need_main_gt + 1, 12):
+		var st: int = top - k + 1
+		if st < 0:
+			continue
+		if st + k - 1 > 11:
+			continue
+		var combo := _try_plane_wings_combo(b, st, k, ex)
+		if not combo.is_empty():
+			return combo
 	return []
 
 

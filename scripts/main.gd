@@ -4,11 +4,16 @@ extends Control
 const Rules = preload("res://scripts/ddz_rules.gd")
 const DdzAi = preload("res://scripts/ddz_ai.gd")
 const Deck = preload("res://scripts/deck.gd")
+const PlayLineBuilderScr = preload("res://scripts/play_line_builder.gd")
 const SFX_DEAL_PATH: String = "res://MusicAssets/shuffle-cards.mp3"
 const SFX_PLAY_PATH: String = "res://MusicAssets/carddrop.mp3"
+const SFX_BOMB_PATH: String = "res://MusicAssets/medium-explosion.mp3"
+const SFX_ROCKET_PATH: String = "res://MusicAssets/launch.mp3"
+const SFX_SETTLEMENT_PATH: String = "res://MusicAssets/level.mp3"
 const SFX_PASS: AudioStream = preload("res://audio/sfx_pass.wav")
-const SFX_BOMB: AudioStream = preload("res://audio/sfx_bomb.wav")
 const DEFAULT_BGM_VOLUME_PCT: float = 60.0
+const SEAT_SPEECH_BUBBLE_SCENE: PackedScene = preload("res://scenes/seat_speech_bubble.tscn")
+const _SeatSpeechBubbleScr = preload("res://scripts/seat_speech_bubble.gd")
 
 signal human_bid_chosen(score: int)
 signal human_rob_chosen(rob: bool)
@@ -45,8 +50,8 @@ const _PLAY_ANIM_STAGGER: float = 0.045
 @onready var _btn_play: Button = %BtnPlay
 @onready var _btn_hint: Button = %BtnHint
 @onready var _btn_pass: Button = %BtnPass
-@onready var _btn_new: Button = %BtnNew
-@onready var _btn_back_menu: Button = %BtnBackMenu
+@onready var _btn_settings_redeal: Button = %BtnSettingsRedeal
+@onready var _btn_settings_to_menu: Button = %BtnSettingsToMenu
 @onready var _label_p0: Label = %LabelP0
 @onready var _label_p1: Label = %LabelP1
 @onready var _label_p2: Label = %LabelP2
@@ -124,6 +129,13 @@ var _play_area_pending_signature: String = ""
 var _seat_cat: Array = [0, 1, 2]
 var _sfx_play_stream: AudioStream
 var _sfx_deal_stream: AudioStream
+var _sfx_bomb_stream: AudioStream
+var _sfx_rocket_stream: AudioStream
+var _sfx_settlement_stream: AudioStream
+var _speech_layer: CanvasLayer
+var _speech_bubbles: Array = []
+var _dlg_confirm_redeal: ConfirmationDialog
+var _dlg_confirm_menu: ConfirmationDialog
 
 
 func _ready() -> void:
@@ -134,6 +146,15 @@ func _ready() -> void:
 	_sfx_deal_stream = load(SFX_DEAL_PATH) as AudioStream
 	if _sfx_deal_stream != null and _sfx_deal_stream is AudioStreamMP3:
 		(_sfx_deal_stream as AudioStreamMP3).loop = false
+	_sfx_bomb_stream = load(SFX_BOMB_PATH) as AudioStream
+	if _sfx_bomb_stream != null and _sfx_bomb_stream is AudioStreamMP3:
+		(_sfx_bomb_stream as AudioStreamMP3).loop = false
+	_sfx_rocket_stream = load(SFX_ROCKET_PATH) as AudioStream
+	if _sfx_rocket_stream != null and _sfx_rocket_stream is AudioStreamMP3:
+		(_sfx_rocket_stream as AudioStreamMP3).loop = false
+	_sfx_settlement_stream = load(SFX_SETTLEMENT_PATH) as AudioStream
+	if _sfx_settlement_stream != null and _sfx_settlement_stream is AudioStreamMP3:
+		(_sfx_settlement_stream as AudioStreamMP3).loop = false
 	if _bgm and _bgm.stream is AudioStreamMP3:
 		(_bgm.stream as AudioStreamMP3).loop = true
 	if _bgm:
@@ -144,13 +165,29 @@ func _ready() -> void:
 		_bgm.play()
 	if _bgm_slider:
 		_bgm_slider.value_changed.connect(_on_bgm_volume_changed)
-	if _sfx_bomb and SFX_BOMB:
-		_sfx_bomb.stream = SFX_BOMB
+	if _sfx_bomb and _sfx_bomb_stream:
+		_sfx_bomb.stream = _sfx_bomb_stream
 	_btn_play.pressed.connect(_on_play_pressed)
 	_btn_hint.pressed.connect(_on_hint_pressed)
 	_btn_pass.pressed.connect(_on_pass_pressed)
-	_btn_new.pressed.connect(_on_redeal_pressed)
-	_btn_back_menu.pressed.connect(_on_back_to_menu_pressed)
+	_dlg_confirm_redeal = ConfirmationDialog.new()
+	_dlg_confirm_redeal.title = "重新发牌"
+	_dlg_confirm_redeal.dialog_text = "是否终止当前游戏并重新发牌？"
+	_dlg_confirm_redeal.ok_button_text = "确定"
+	_dlg_confirm_redeal.cancel_button_text = "取消"
+	add_child(_dlg_confirm_redeal)
+	_dlg_confirm_redeal.confirmed.connect(_on_redeal_confirmed)
+	call_deferred("_apply_styled_confirmation_dialog", _dlg_confirm_redeal)
+	_dlg_confirm_menu = ConfirmationDialog.new()
+	_dlg_confirm_menu.title = "返回开始界面"
+	_dlg_confirm_menu.dialog_text = "是否返回开始界面？当前对局将结束。"
+	_dlg_confirm_menu.ok_button_text = "确定"
+	_dlg_confirm_menu.cancel_button_text = "取消"
+	add_child(_dlg_confirm_menu)
+	_dlg_confirm_menu.confirmed.connect(_on_to_menu_confirmed)
+	call_deferred("_apply_styled_confirmation_dialog", _dlg_confirm_menu)
+	_btn_settings_redeal.pressed.connect(_on_settings_redeal_pressed)
+	_btn_settings_to_menu.pressed.connect(_on_settings_to_menu_pressed)
 	_btn_bid0.pressed.connect(func() -> void: human_bid_chosen.emit(0))
 	_btn_bid1.pressed.connect(func() -> void: human_bid_chosen.emit(1))
 	_btn_bid2.pressed.connect(func() -> void: human_bid_chosen.emit(2))
@@ -159,8 +196,68 @@ func _ready() -> void:
 	%BtnRobNo.pressed.connect(func() -> void: human_rob_chosen.emit(false))
 	_shuffle_seat_cats()
 	_apply_name_plates()
+	_setup_seat_speech()
 	await _play_deal_sequence()
 	await _run_new_round()
+
+
+## 使用引擎内嵌弹窗（非系统原生），并套用与结算区一致的墨绿牌桌风格。
+func _apply_styled_confirmation_dialog(dlg: ConfirmationDialog) -> void:
+	dlg.force_native_dialog = false
+	dlg.unresizable = true
+	dlg.min_size = Vector2(300, 148)
+	dlg.dialog_autowrap = true
+	var panel: StyleBoxFlat = StyleBoxFlat.new()
+	panel.bg_color = Color(0.07, 0.14, 0.11, 0.96)
+	panel.border_color = Color(0.42, 0.72, 0.52, 0.85)
+	panel.set_border_width_all(2)
+	panel.set_corner_radius_all(14)
+	panel.content_margin_left = 20.0
+	panel.content_margin_top = 14.0
+	panel.content_margin_right = 20.0
+	panel.content_margin_bottom = 16.0
+	panel.shadow_color = Color(0, 0, 0, 0.42)
+	panel.shadow_size = 10
+	panel.shadow_offset = Vector2(0, 4)
+	dlg.add_theme_stylebox_override("panel", panel)
+	dlg.add_theme_color_override("title_color", Color(0.98, 0.94, 0.78, 1))
+	dlg.add_theme_font_size_override("title_font_size", 17)
+	var body: Label = dlg.get_label()
+	if body:
+		body.add_theme_font_size_override("font_size", 14)
+		body.add_theme_color_override("font_color", Color(0.88, 0.96, 0.9, 1))
+		body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var ok: Button = dlg.get_ok_button()
+	var cancel: Button = dlg.get_cancel_button()
+	if cancel:
+		_apply_confirm_dialog_button_style(cancel, false)
+	if ok:
+		_apply_confirm_dialog_button_style(ok, true)
+
+
+func _apply_confirm_dialog_button_style(btn: Button, primary: bool) -> void:
+	var n := StyleBoxFlat.new()
+	n.bg_color = Color(0.2, 0.44, 0.3, 0.96) if not primary else Color(0.26, 0.52, 0.35, 0.98)
+	n.border_color = Color(0.48, 0.78, 0.55, 0.75)
+	n.set_border_width_all(1)
+	n.set_corner_radius_all(9)
+	n.content_margin_left = 18.0
+	n.content_margin_top = 7.0
+	n.content_margin_right = 18.0
+	n.content_margin_bottom = 7.0
+	var h := n.duplicate() as StyleBoxFlat
+	h.bg_color = Color(0.26, 0.5, 0.34, 1.0) if not primary else Color(0.3, 0.58, 0.4, 1.0)
+	var p := n.duplicate() as StyleBoxFlat
+	p.bg_color = Color(0.16, 0.36, 0.24, 1.0) if not primary else Color(0.2, 0.44, 0.3, 1.0)
+	btn.add_theme_stylebox_override("normal", n)
+	btn.add_theme_stylebox_override("hover", h)
+	btn.add_theme_stylebox_override("pressed", p)
+	btn.add_theme_stylebox_override("focus", n)
+	btn.add_theme_font_size_override("font_size", 14)
+	btn.add_theme_color_override("font_color", Color(0.96, 0.98, 0.94))
+	btn.add_theme_color_override("font_hover_color", Color(1, 1, 1))
+	btn.custom_minimum_size = Vector2(100, 32)
 
 
 func _log_line(bb: String) -> void:
@@ -184,6 +281,111 @@ func _shuffle_seat_cats() -> void:
 
 func _cat_name(seat_idx: int) -> String:
 	return String(CAT_NAMES[int(_seat_cat[seat_idx])])
+
+
+func _setup_seat_speech() -> void:
+	_speech_layer = CanvasLayer.new()
+	_speech_layer.layer = 22
+	add_child(_speech_layer)
+	for i in range(3):
+		var b: Node = SEAT_SPEECH_BUBBLE_SCENE.instantiate()
+		_speech_layer.add_child(b)
+		_speech_bubbles.append(b)
+		if b.has_method("set_tail_anchor"):
+			match i:
+				0:
+					b.call("set_tail_anchor", _SeatSpeechBubbleScr.TailAnchor.RIGHT)
+				1:
+					b.call("set_tail_anchor", _SeatSpeechBubbleScr.TailAnchor.BOTTOM_RIGHT)
+				_:
+					b.call("set_tail_anchor", _SeatSpeechBubbleScr.TailAnchor.BOTTOM_LEFT)
+		var seat_idx: int = i
+		if b.has_signal("layout_finished"):
+			b.connect("layout_finished", func() -> void: _place_speech_bubble_for_seat(seat_idx))
+		b.hide_immediately()
+	if not get_viewport().size_changed.is_connected(_on_viewport_size_changed_speech):
+		get_viewport().size_changed.connect(_on_viewport_size_changed_speech)
+	call_deferred("_layout_all_speech_bubbles")
+
+
+func _on_viewport_size_changed_speech() -> void:
+	_layout_all_speech_bubbles()
+
+
+func _layout_all_speech_bubbles() -> void:
+	if _speech_bubbles.is_empty():
+		return
+	var avatars: Array[Control] = [_avatar_p0, _avatar_p1, _avatar_p2]
+	for i in range(3):
+		_place_speech_bubble(_speech_bubbles[i], avatars[i], i)
+
+
+func _place_speech_bubble_for_seat(seat: int) -> void:
+	if seat < 0 or seat >= _speech_bubbles.size():
+		return
+	var avatars: Array[Control] = [_avatar_p0, _avatar_p1, _avatar_p2]
+	_place_speech_bubble(_speech_bubbles[seat], avatars[seat], seat)
+
+
+func _clamp_speech_bubble_to_viewport(bubble: Control) -> void:
+	if bubble == null:
+		return
+	var vp: Rect2 = bubble.get_viewport().get_visible_rect()
+	var margin: float = 8.0
+	var sz: Vector2 = bubble.size
+	if sz.x < 2.0 or sz.y < 2.0:
+		sz = bubble.get_combined_minimum_size()
+	var pos: Vector2 = bubble.global_position
+	var min_x: float = vp.position.x + margin
+	var max_x: float = vp.end.x - sz.x - margin
+	var min_y: float = vp.position.y + margin
+	var max_y: float = vp.end.y - sz.y - margin
+	if max_x < min_x:
+		pos.x = vp.position.x + (vp.size.x - sz.x) * 0.5
+	else:
+		pos.x = clampf(pos.x, min_x, max_x)
+	if max_y < min_y:
+		pos.y = vp.position.y + (vp.size.y - sz.y) * 0.5
+	else:
+		pos.y = clampf(pos.y, min_y, max_y)
+	bubble.global_position = pos
+
+
+func _place_speech_bubble(bubble: Control, avatar: Control, seat: int) -> void:
+	if bubble == null or avatar == null:
+		return
+	var g: Rect2 = avatar.get_global_rect()
+	var bs: Vector2 = bubble.size
+	if bs.x < 4.0 or bs.y < 4.0:
+		bs = bubble.get_combined_minimum_size()
+	match seat:
+		0:
+			## 下方玩家：气泡在头像左侧，针脚朝右指向头像（红圈）
+			bubble.global_position = Vector2(
+				g.position.x - bs.x - 10.0,
+				g.position.y + g.size.y * 0.5 - bs.y * 0.5
+			)
+		1:
+			## 右侧 AI：气泡在头像左上，针脚朝右下指向头像（黄圈）
+			bubble.global_position = Vector2(
+				g.position.x - bs.x + 44.0,
+				g.position.y - bs.y - 12.0
+			)
+		_:
+			## 左侧 AI：气泡在头像右上，针脚朝左下指向头像（蓝圈）
+			bubble.global_position = Vector2(
+				g.end.x + 10.0,
+				g.position.y - bs.y - 12.0
+			)
+	_clamp_speech_bubble_to_viewport(bubble)
+
+
+func _seat_say(who: int, line: String, duration_sec: float = 2.5) -> void:
+	if who < 0 or who >= _speech_bubbles.size():
+		return
+	var b: Node = _speech_bubbles[who]
+	if b and b.has_method("say"):
+		b.call("say", line, duration_sec)
 
 
 func _apply_name_plates() -> void:
@@ -229,6 +431,11 @@ func _sfx_play_bomb() -> void:
 		_sfx_bomb.play()
 
 
+func _sfx_play_rocket() -> void:
+	if _sfx_rocket_stream:
+		_sfx_play(_sfx_rocket_stream)
+
+
 func _play_deal_sequence() -> void:
 	_deal_layer.show()
 	_set_in_game_interactive(false)
@@ -259,24 +466,38 @@ func _set_in_game_interactive(on: bool) -> void:
 	_btn_play.disabled = not on
 	_btn_hint.disabled = not on
 	_btn_pass.disabled = not on
-	_btn_new.disabled = not on
+	_btn_settings_redeal.disabled = not on
+	_btn_settings_to_menu.disabled = not on
 
 
 func _ddz_less(a: int, b: int) -> bool:
 	return CardDefs.ddz_rank_value(a) < CardDefs.ddz_rank_value(b)
 
 
-func _on_redeal_pressed() -> void:
+func _on_settings_redeal_pressed() -> void:
+	_dlg_confirm_redeal.popup_centered()
+
+
+func _on_redeal_confirmed() -> void:
+	_settlement_layer.hide()
 	await _play_deal_sequence()
 	await _run_new_round()
 
 
-func _on_back_to_menu_pressed() -> void:
+func _on_settings_to_menu_pressed() -> void:
+	_dlg_confirm_menu.popup_centered()
+
+
+func _on_to_menu_confirmed() -> void:
+	_settlement_layer.hide()
 	get_tree().change_scene_to_file("res://scenes/start_menu.tscn")
 
 
 func _run_new_round() -> void:
 	_match_round_index += 1
+	for sb in _speech_bubbles:
+		if sb and sb.has_method("hide_immediately"):
+			sb.call("hide_immediately")
 	_apply_name_plates()
 	_refresh_score_strip()
 	_winner = -1
@@ -293,7 +514,7 @@ func _run_new_round() -> void:
 	_bidding_active = true
 	if _title:
 		_title.text = "斗地主 · 叫地主中…"
-	_btn_new.disabled = true
+	_btn_settings_redeal.disabled = true
 	_btn_play.disabled = true
 	_btn_hint.disabled = true
 	_btn_pass.disabled = true
@@ -357,6 +578,19 @@ func _bid_choice_label(b: int) -> String:
 	return str(b)
 
 
+func _bid_speech_line(bid: int) -> String:
+	match bid:
+		0:
+			return "不叫"
+		1:
+			return "叫1倍"
+		2:
+			return "叫2倍"
+		3:
+			return "叫3倍"
+	return ""
+
+
 func _bottom_ids_array() -> Array:
 	var a: Array = []
 	for i in _bottom.size():
@@ -395,6 +629,7 @@ func _run_bidding_phase() -> void:
 			bid = DdzAi.choose_bid(_hands[i], DdzAi.style_from_cat_id(int(_seat_cat[i])))
 		_bids[i] = bid
 		await _log_line("%s 选择：[b]%s[/b]" % [_cat_name(i), _bid_choice_label(bid)])
+		_seat_say(i, _bid_speech_line(bid))
 	var candidate: int = _resolve_call_candidate()
 	var best_call: int = 0
 	for j in range(3):
@@ -405,6 +640,7 @@ func _run_bidding_phase() -> void:
 		_mult_base = 1
 		_sync_round_multiplier()
 		await _log_line("三家均未叫倍，默认地主：[b]%s[/b] ｜ 基础倍率 [b]×1[/b]（无抢地主）" % _cat_name(_landlord))
+		_seat_say(_landlord, "这把我是地主了，哈哈！", 3.6)
 	else:
 		_mult_base = max(1, best_call)
 		_sync_round_multiplier()
@@ -441,6 +677,7 @@ func _run_rob_landlord_phase(candidate: int) -> void:
 		await _log_line("%s 抢地主选择…" % _cat_name(i))
 		if int(_bids[i]) == 0:
 			await _log_line("%s [b]不可抢[/b]（已不叫）" % _cat_name(i))
+			_seat_say(i, "没叫牌，不能抢")
 			continue
 		var do_rob: bool = false
 		if i == HUMAN_INDEX:
@@ -457,13 +694,16 @@ func _run_rob_landlord_phase(candidate: int) -> void:
 			_sync_round_multiplier()
 			last_robber = i
 			await _log_line("%s [b]抢地主[/b]！当前总倍率：×%d（基础×%d × 抢×%d）" % [_cat_name(i), _round_multiplier, _mult_base, _mult_rob])
+			_seat_say(i, "抢地主！")
 		else:
 			await _log_line("%s 不抢" % _cat_name(i))
+			_seat_say(i, "不抢")
 	if last_robber >= 0:
 		_landlord = last_robber
 	else:
 		_landlord = candidate
 	await _log_line("最终地主：[b]%s[/b] ｜ 当前总倍率：×%d（基础×%d × 抢×%d，出牌后炸弹/王炸再累乘）" % [_cat_name(_landlord), _round_multiplier, _mult_base, _mult_rob])
+	_seat_say(_landlord, "这把我是地主了，哈哈！", 3.6)
 
 
 func _human_rob_once() -> bool:
@@ -592,6 +832,8 @@ func _format_settlement_bbcode() -> String:
 
 
 func _run_settlement_flow() -> void:
+	if _sfx_settlement_stream:
+		_sfx_play(_sfx_settlement_stream)
 	_apply_round_scores()
 	if _settle_body:
 		_settle_body.text = _format_settlement_bbcode()
@@ -669,6 +911,7 @@ func _log_play(who: int, card_ids: Array, pat: Dictionary) -> void:
 
 
 func _state_pass(who: int) -> void:
+	_seat_say(who, PlayLineBuilderScr.speech_line_pass())
 	_sfx_play(SFX_PASS)
 	_passes += 1
 	_turn = (who + 1) % 3
@@ -687,15 +930,16 @@ func _register_seen_cards(card_ids: Array) -> void:
 
 
 func _state_play(who: int, card_ids: Array, pattern: Dictionary) -> void:
+	_seat_say(who, PlayLineBuilderScr.speech_line_for_play(pattern, card_ids))
 	if who == HUMAN_INDEX:
 		_capture_human_play_starts(card_ids)
 	else:
 		_play_anim_starts_override.clear()
 	_register_seen_cards(card_ids)
 	_last_play_ids = card_ids.duplicate()
-	_sfx_play(_sfx_play_stream)
 	var pk: int = int(pattern.get("kind", Rules.Kind.INVALID))
 	if pk == Rules.Kind.BOMB:
+		_sfx_play(_sfx_play_stream)
 		_play_bomb_count += 1
 		_mult_play *= 2
 		_sync_round_multiplier()
@@ -703,11 +947,15 @@ func _state_play(who: int, card_ids: Array, pattern: Dictionary) -> void:
 		_log_line_sync("炸弹！出牌倍率×%d ｜ 当前总倍率：×%d" % [_mult_play, _round_multiplier])
 		_refresh_match_title()
 	elif pk == Rules.Kind.ROCKET:
+		_sfx_play(_sfx_play_stream)
 		_play_rocket_count += 1
 		_mult_play *= 4
 		_sync_round_multiplier()
+		_sfx_play_rocket()
 		_log_line_sync("王炸！出牌倍率×%d ｜ 当前总倍率：×%d" % [_mult_play, _round_multiplier])
 		_refresh_match_title()
+	else:
+		_sfx_play(_sfx_play_stream)
 	var hand: PackedInt32Array = _hands[who]
 	var remove_set: Dictionary = {}
 	for id in card_ids:
@@ -743,11 +991,9 @@ func _refresh_ui() -> void:
 		_btn_play.disabled = true
 		_btn_hint.disabled = true
 		_btn_pass.disabled = true
-		_btn_new.disabled = true
-		_btn_back_menu.visible = true
+		_btn_settings_redeal.disabled = true
 	else:
 		_status.text = _build_status_text()
-		_btn_back_menu.visible = false
 		if not _bidding_active:
 			_refresh_match_title()
 	for c in _hand_row.get_children():
@@ -842,33 +1088,7 @@ func _build_status_text() -> String:
 
 
 func _kind_name(p: Dictionary) -> String:
-	var k: int = p.get("kind", 0)
-	match k:
-		Rules.Kind.SINGLE:
-			return "单张"
-		Rules.Kind.PAIR:
-			return "对子"
-		Rules.Kind.TRIPLE:
-			return "三张"
-		Rules.Kind.STRAIGHT:
-			return "顺子(%d张)" % int(p.get("extra", 0))
-		Rules.Kind.BOMB:
-			return "炸弹"
-		Rules.Kind.ROCKET:
-			return "王炸"
-		Rules.Kind.TRIPLE_WITH_SINGLE:
-			return "三带一"
-		Rules.Kind.TRIPLE_WITH_PAIR:
-			return "三带二"
-		Rules.Kind.PAIR_STRAIGHT:
-			return "连对(%d张)" % int(p.get("extra", 0))
-		Rules.Kind.FOUR_WITH_TWO:
-			var ex: int = int(p.get("extra", 0))
-			return "四带二(%d张)" % ex
-		Rules.Kind.PLANE:
-			return "飞机(10张)"
-		_:
-			return "—"
+	return PlayLineBuilderScr.kind_display_name(p)
 
 
 func _selected_cards(override_tb: TextureButton = null, override_pressed: bool = false) -> Array:

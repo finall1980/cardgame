@@ -5,6 +5,14 @@ const COUNT = 54
 const RANKS_PER_SUIT = 13
 ## 与 `suit_of` 一致：方块、梅花、红桃、黑桃 → 资源前缀 D/C/H/S
 const PLAYINGCARD_SUIT_PREFIX: Array[String] = ["D", "C", "H", "S"]
+## 与 `suit_of` 一致：方块、梅花、红桃、黑桃
+const SUIT_NAMES_ZH: Array[String] = ["方块", "梅花", "红桃", "黑桃"]
+
+
+static func suit_name_zh(suit_idx: int) -> String:
+	if suit_idx >= 0 and suit_idx < SUIT_NAMES_ZH.size():
+		return String(SUIT_NAMES_ZH[suit_idx])
+	return ""
 
 
 static func is_joker(card_id: int) -> bool:

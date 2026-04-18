@@ -19,3 +19,9 @@ mono_crash.*.json
 
 # Build
 builds/
+
+# Web 调试：serve.py 生成的自签名证书
+WebApp/.dev_https/
+
+# Godot HTML5 导出目录（含 .pck/.wasm 等，体积大，不纳入版本库）
+/WebApp/

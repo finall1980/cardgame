@@ -18,6 +18,11 @@ config/name="DouDizhu"
 run/main_scene="res://scenes/start_menu.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 
+[autoload]
+
+Nakama="*res://addons/com.heroiclabs.nakama/Nakama.gd"
+OnlineSession="*res://scripts/online_session.gd"
+
 [display]
 
 window/size/viewport_height=780
@@ -26,7 +31,6 @@ window/stretch/mode="canvas_items"
 [gui]
 
 theme/custom="res://theme/game_theme.tres"
-theme/default_font_antialiasing=1
 
 [rendering]
 

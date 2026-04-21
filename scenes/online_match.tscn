@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://ddz_online_match_v1"]
+
+[ext_resource type="PackedScene" uid="uid://bqj8maindd001" path="res://scenes/main.tscn" id="1_main"]
+[ext_resource type="Script" path="res://scripts/online_match.gd" id="2_online"]
+
+[node name="Main" instance=ExtResource("1_main")]
+script = ExtResource("2_online")

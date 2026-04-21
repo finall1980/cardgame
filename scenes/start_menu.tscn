@@ -1,26 +1,81 @@
-[gd_scene load_steps=5 format=3 uid="uid://c8startmenu01"]
+[gd_scene format=3 uid="uid://bu2jney644odb"]
 
-[ext_resource type="Script" path="res://scripts/start_menu.gd" id="1"]
-[ext_resource type="Texture2D" path="res://CardsAssets/indexbg.png" id="2_bg"]
-[ext_resource type="AudioStream" path="res://MusicAssets/BGM.mp3" id="3_bgm"]
+[ext_resource type="Script" uid="uid://dxq3pa4jmkwss" path="res://scripts/start_menu.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://2dyrtko4wkf8" path="res://CardsAssets/indexbg.png" id="2_bg"]
+[ext_resource type="AudioStream" uid="uid://chxfc8x170cb8" path="res://MusicAssets/BGM.mp3" id="3_bgm"]
+[ext_resource type="Texture2D" uid="uid://1y3aek32rcfs" path="res://CardsAssets/index_b1.png" id="4_tex_b1"]
+[ext_resource type="Texture2D" uid="uid://txdk6oqa3ra5" path="res://CardsAssets/index_b2.png" id="5_tex_b2"]
+[ext_resource type="Texture2D" uid="uid://cwt3w4e6tave0" path="res://CardsAssets/index_b3.png" id="6_tex_b3"]
+[ext_resource type="Texture2D" uid="uid://croem62xomhe7" path="res://CardsAssets/index_b4.png" id="7_tex_b4"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_startbtn"]
-bg_color = Color(0.96, 0.86, 0.55, 0.92)
+[sub_resource type="StyleBoxFlat" id="AuthPanel_style"]
+content_margin_left = 18.0
+content_margin_top = 16.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
+bg_color = Color(0.06, 0.12, 0.09, 0.96)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.55, 0.35, 0.12, 1)
+border_color = Color(0.42, 0.72, 0.55, 0.9)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 10
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="BtnDialogSecondary_style"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.09, 0.2, 0.14, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.68, 0.5, 0.75)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-content_margin_left = 20.0
-content_margin_top = 10.0
-content_margin_right = 20.0
-content_margin_bottom = 10.0
 
-[node name="StartMenu" type="Control"]
+[sub_resource type="StyleBoxFlat" id="LineEdit_style"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+bg_color = Color(0.98, 0.97, 0.94, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.55, 0.42, 0.55)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="BtnDialogPrimary_style"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.22, 0.48, 0.34, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.82, 0.58, 0.95)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="StartMenu" type="Control" unique_id=438326811]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -29,12 +84,11 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="BgmPlayer" type="AudioStreamPlayer" parent="."]
+[node name="BgmPlayer" type="AudioStreamPlayer" parent="." unique_id=2054615257]
 unique_name_in_owner = true
 stream = ExtResource("3_bgm")
-bus = &"Master"
 
-[node name="BackgroundTex" type="TextureRect" parent="."]
+[node name="BackgroundTex" type="TextureRect" parent="." unique_id=1222426052]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -46,25 +100,307 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="BottomCenter" type="CenterContainer" parent="."]
+[node name="TopRightVolumeRow" type="MarginContainer" parent="."]
+layout_mode = 1
+z_index = 5
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -42.0
+offset_top = 10.0
+offset_right = -12.0
+offset_bottom = 20.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="BgmVolumeSlider" type="HSlider" parent="TopRightVolumeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(30, 10)
+min_value = 0.0
+max_value = 100.0
+step = 1.0
+value = 0.0
+tooltip_text = "背景音乐音量"
+
+[node name="BottomDock" type="Control" parent="." unique_id=2080043111]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -152.0
-offset_bottom = -20.0
+offset_left = 12.0
+offset_top = -400.0
+offset_right = -12.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MenuColsHBox" type="HBoxContainer" parent="BottomDock" unique_id=1355982706]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 5
+alignment = 1
 
-[node name="StartBtn" type="Button" parent="BottomCenter"]
+[node name="MenuColLeft" type="VBoxContainer" parent="BottomDock/MenuColsHBox" unique_id=1148812433]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.12, 0.08, 0.02, 1)
-theme_override_colors/font_hover_color = Color(0.18, 0.12, 0.04, 1)
-theme_override_colors/font_pressed_color = Color(0.08, 0.05, 0.01, 1)
-theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("StyleBoxFlat_startbtn")
-theme_override_styles/hover = SubResource("StyleBoxFlat_startbtn")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_startbtn")
-text = "开始游戏"
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+
+[node name="BtnSinglePlayer" type="TextureButton" parent="BottomDock/MenuColsHBox/MenuColLeft" unique_id=915890126]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(474, 90)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("4_tex_b1")
+texture_pressed = ExtResource("4_tex_b1")
+texture_hover = ExtResource("4_tex_b1")
+texture_disabled = ExtResource("4_tex_b1")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="BtnSettings" type="TextureButton" parent="BottomDock/MenuColsHBox/MenuColLeft" unique_id=831934737]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(474, 90)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("6_tex_b3")
+texture_pressed = ExtResource("6_tex_b3")
+texture_hover = ExtResource("6_tex_b3")
+texture_disabled = ExtResource("6_tex_b3")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MenuColRight" type="VBoxContainer" parent="BottomDock/MenuColsHBox" unique_id=471709695]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+
+[node name="BtnOnline" type="TextureButton" parent="BottomDock/MenuColsHBox/MenuColRight" unique_id=1663060978]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(474, 90)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("5_tex_b2")
+texture_pressed = ExtResource("5_tex_b2")
+texture_hover = ExtResource("5_tex_b2")
+texture_disabled = ExtResource("5_tex_b2")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="BtnLeaderboard" type="TextureButton" parent="BottomDock/MenuColsHBox/MenuColRight" unique_id=1217071714]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(474, 90)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("7_tex_b4")
+texture_pressed = ExtResource("7_tex_b4")
+texture_hover = ExtResource("7_tex_b4")
+texture_disabled = ExtResource("7_tex_b4")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="AuthOverlay" type="CanvasLayer" parent="." unique_id=1238630914]
+unique_name_in_owner = true
+layer = 20
+visible = false
+
+[node name="Dim" type="ColorRect" parent="AuthOverlay" unique_id=1416271870]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.06, 0.04, 0.62)
+
+[node name="AuthCenter" type="CenterContainer" parent="AuthOverlay" unique_id=193400324]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="AuthDialog" type="PanelContainer" parent="AuthOverlay/AuthCenter" unique_id=1997212244]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = SubResource("AuthPanel_style")
+
+[node name="AuthVBox" type="VBoxContainer" parent="AuthOverlay/AuthCenter/AuthDialog" unique_id=2045357150]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AuthHeaderRow" type="HBoxContainer" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox" unique_id=899290219]
+layout_mode = 2
+alignment = 1
+
+[node name="AuthPopupTitle" type="Label" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox/AuthHeaderRow" unique_id=418916618]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.93, 0.78, 1)
+theme_override_font_sizes/font_size = 17
+text = "联网登录"
+horizontal_alignment = 1
+
+[node name="BtnPopClose" type="Button" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox/AuthHeaderRow" unique_id=769676588]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 28)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.92, 0.88, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("BtnDialogSecondary_style")
+theme_override_styles/pressed = SubResource("BtnDialogSecondary_style")
+theme_override_styles/hover = SubResource("BtnDialogSecondary_style")
+text = "×"
+
+[node name="LblEmailPop" type="Label" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox" unique_id=880533370]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 12
+text = "邮箱"
+
+[node name="PopEmail" type="LineEdit" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox" unique_id=930036363]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.1, 0.08, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("LineEdit_style")
+placeholder_text = "name@example.com"
+
+[node name="LblPasswordPop" type="Label" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox" unique_id=2117517384]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 12
+text = "密码（至少 8 位）"
+
+[node name="PopPassword" type="LineEdit" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox" unique_id=668394329]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.1, 0.08, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("LineEdit_style")
+placeholder_text = "请输入密码"
+secret = true
+
+[node name="RememberRow" type="HBoxContainer" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox" unique_id=258652227]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AuthRememberMe" type="CheckBox" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox/RememberRow" unique_id=258652226]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 12
+text = "记住我（本机保存用户名和密码）"
+
+[node name="RegisterExtra" type="VBoxContainer" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox" unique_id=258652228]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="LblNickname" type="Label" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox/RegisterExtra" unique_id=321576921]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 12
+text = "昵称（显示名称）"
+
+[node name="PopNickname" type="LineEdit" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox/RegisterExtra" unique_id=1334314534]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.1, 0.08, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("LineEdit_style")
+placeholder_text = "游戏中显示的名字"
+
+[node name="AuthPopupStatus" type="Label" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox" unique_id=1754805849]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.94, 0.88, 1)
+theme_override_font_sizes/font_size = 11
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="LoginBtnRow" type="HBoxContainer" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox" unique_id=1866824595]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PopLogin" type="Button" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox/LoginBtnRow" unique_id=107773397]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.98, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("BtnDialogPrimary_style")
+theme_override_styles/pressed = SubResource("BtnDialogPrimary_style")
+theme_override_styles/hover = SubResource("BtnDialogPrimary_style")
+text = "登录"
+
+[node name="PopToRegister" type="Button" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox/LoginBtnRow" unique_id=1533592721]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.96, 0.92, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("BtnDialogSecondary_style")
+theme_override_styles/pressed = SubResource("BtnDialogSecondary_style")
+theme_override_styles/hover = SubResource("BtnDialogSecondary_style")
+text = "注册"
+
+[node name="RegisterBtnRow" type="HBoxContainer" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox" unique_id=1631918363]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PopRegisterSubmit" type="Button" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox/RegisterBtnRow" unique_id=139317439]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.98, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("BtnDialogPrimary_style")
+theme_override_styles/pressed = SubResource("BtnDialogPrimary_style")
+theme_override_styles/hover = SubResource("BtnDialogPrimary_style")
+text = "注册"
+
+[node name="PopBackToLogin" type="Button" parent="AuthOverlay/AuthCenter/AuthDialog/AuthVBox/RegisterBtnRow" unique_id=972113280]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.96, 0.92, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("BtnDialogSecondary_style")
+theme_override_styles/pressed = SubResource("BtnDialogSecondary_style")
+theme_override_styles/hover = SubResource("BtnDialogSecondary_style")
+text = "返回登录"

@@ -1,0 +1,344 @@
+[gd_scene format=3 uid="uid://c8lobbydd001"]
+
+[ext_resource type="Script" path="res://scripts/multiplayer_lobby.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://CardsAssets/cardbg.png" id="2_bg"]
+
+[sub_resource type="StyleBoxFlat" id="PanelMain_style"]
+content_margin_left = 18.0
+content_margin_top = 16.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
+bg_color = Color(0.06, 0.12, 0.09, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.42, 0.72, 0.55, 0.85)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 8
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="BtnPrimary_style"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.22, 0.48, 0.34, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.82, 0.58, 0.95)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="BtnSecondary_style"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.09, 0.2, 0.14, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.68, 0.5, 0.75)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="LineEditChat_style"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+bg_color = Color(0.98, 0.97, 0.94, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.55, 0.42, 0.55)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="MultiplayerLobby" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="RootMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="MainHBox" type="HBoxContainer" parent="RootMargin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="LeftPanel" type="PanelContainer" parent="RootMargin/MainHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.42
+theme_override_styles/panel = SubResource("PanelMain_style")
+
+[node name="LeftVBox" type="VBoxContainer" parent="RootMargin/MainHBox/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LeftTitle" type="Label" parent="RootMargin/MainHBox/LeftPanel/LeftVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.93, 0.78, 1)
+theme_override_font_sizes/font_size = 18
+text = "我的资料"
+
+[node name="LblProfileUsername" type="Label" parent="RootMargin/MainHBox/LeftPanel/LeftVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+text = "用户名：—"
+
+[node name="LblProfileEmail" type="Label" parent="RootMargin/MainHBox/LeftPanel/LeftVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+text = "邮箱：—"
+
+[node name="LblProfileNickname" type="Label" parent="RootMargin/MainHBox/LeftPanel/LeftVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+text = "昵称：—"
+
+[node name="LblProfileLocation" type="Label" parent="RootMargin/MainHBox/LeftPanel/LeftVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+text = "位置：—"
+
+[node name="LblProfileCreated" type="Label" parent="RootMargin/MainHBox/LeftPanel/LeftVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+text = "注册时间：—"
+
+[node name="WalletRow" type="HBoxContainer" parent="RootMargin/MainHBox/LeftPanel/LeftVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LblWalletCoins" type="Label" parent="RootMargin/MainHBox/LeftPanel/LeftVBox/WalletRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.88, 0.55, 1)
+theme_override_font_sizes/font_size = 15
+text = "游戏币：—"
+
+[node name="BtnBuyCoins" type="Button" parent="RootMargin/MainHBox/LeftPanel/LeftVBox/WalletRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(88, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.98, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("BtnSecondary_style")
+theme_override_styles/pressed = SubResource("BtnSecondary_style")
+theme_override_styles/hover = SubResource("BtnSecondary_style")
+text = "购买 +100"
+
+[node name="RightVBox" type="VBoxContainer" parent="RootMargin/MainHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.58
+theme_override_constants/separation = 16
+
+[node name="ActionsPanel" type="PanelContainer" parent="RootMargin/MainHBox/RightVBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("PanelMain_style")
+
+[node name="ActionsVBox" type="VBoxContainer" parent="RootMargin/MainHBox/RightVBox/ActionsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ActionsTitle" type="Label" parent="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.93, 0.78, 1)
+theme_override_font_sizes/font_size = 17
+text = "联机大厅"
+
+[node name="MatchStatusLabel" type="Label" parent="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.96, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+
+[node name="MatchRow" type="HBoxContainer" parent="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BtnMatchNow" type="Button" parent="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox/MatchRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.98, 0.95, 1)
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("BtnPrimary_style")
+theme_override_styles/pressed = SubResource("BtnPrimary_style")
+theme_override_styles/hover = SubResource("BtnPrimary_style")
+text = "马上匹配"
+
+[node name="MatchTimerLabel" type="Label" parent="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox/MatchRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.92, 0.88, 1)
+theme_override_font_sizes/font_size = 15
+text = "0 秒"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BtnRowCreateJoin" type="HBoxContainer" parent="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BtnCreateRoom" type="Button" parent="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox/BtnRowCreateJoin"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.98, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("BtnSecondary_style")
+theme_override_styles/pressed = SubResource("BtnSecondary_style")
+theme_override_styles/hover = SubResource("BtnSecondary_style")
+text = "创建房间"
+
+[node name="BtnJoinRoom" type="Button" parent="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox/BtnRowCreateJoin"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.98, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("BtnSecondary_style")
+theme_override_styles/pressed = SubResource("BtnSecondary_style")
+theme_override_styles/hover = SubResource("BtnSecondary_style")
+text = "加入房间"
+
+[node name="BtnBackToLogin" type="Button" parent="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.98, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("BtnSecondary_style")
+theme_override_styles/pressed = SubResource("BtnSecondary_style")
+theme_override_styles/hover = SubResource("BtnSecondary_style")
+text = "返回登录"
+
+[node name="ChatPanel" type="PanelContainer" parent="RootMargin/MainHBox/RightVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("PanelMain_style")
+
+[node name="ChatVBox" type="VBoxContainer" parent="RootMargin/MainHBox/RightVBox/ChatPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ChatTitle" type="Label" parent="RootMargin/MainHBox/RightVBox/ChatPanel/ChatVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.93, 0.78, 1)
+theme_override_font_sizes/font_size = 16
+text = "大厅聊天"
+
+[node name="ChatScroll" type="ScrollContainer" parent="RootMargin/MainHBox/RightVBox/ChatPanel/ChatVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 180)
+horizontal_scroll_mode = 0
+
+[node name="LobbyChatLog" type="RichTextLabel" parent="RootMargin/MainHBox/RightVBox/ChatPanel/ChatVBox/ChatScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_horizontal = 3
+theme_override_colors/default_color = Color(0.88, 0.96, 0.9, 1)
+theme_override_font_sizes/normal_font_size = 13
+bbcode_enabled = false
+fit_content = true
+scroll_active = false
+autowrap_mode = 3
+selection_enabled = true
+
+[node name="ChatInputRow" type="HBoxContainer" parent="RootMargin/MainHBox/RightVBox/ChatPanel/ChatVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LobbyChatInput" type="LineEdit" parent="RootMargin/MainHBox/RightVBox/ChatPanel/ChatVBox/ChatInputRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 36)
+theme_override_colors/font_color = Color(0.12, 0.1, 0.08, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("LineEditChat_style")
+placeholder_text = "输入消息，回车发送…"
+max_length = 256
+
+[node name="BtnLobbyChatSend" type="Button" parent="RootMargin/MainHBox/RightVBox/ChatPanel/ChatVBox/ChatInputRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(88, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.98, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("BtnPrimary_style")
+theme_override_styles/pressed = SubResource("BtnPrimary_style")
+theme_override_styles/hover = SubResource("BtnPrimary_style")
+text = "发送"
+
+[connection signal="pressed" from="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox/MatchRow/BtnMatchNow" to="." method="_on_btn_match_now_pressed"]
+[connection signal="pressed" from="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox/BtnRowCreateJoin/BtnCreateRoom" to="." method="_on_btn_create_room_pressed"]
+[connection signal="pressed" from="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox/BtnRowCreateJoin/BtnJoinRoom" to="." method="_on_btn_join_room_pressed"]
+[connection signal="pressed" from="RootMargin/MainHBox/RightVBox/ActionsPanel/ActionsVBox/BtnBackToLogin" to="." method="_on_btn_back_to_login_pressed"]

@@ -1,0 +1,80 @@
+version: "3"
+services:
+  cockroachdb:
+    image: cockroachdb/cockroach:latest-v23.1
+    command: start-single-node --insecure --store=attrs=ssd,path=/var/lib/cockroach/
+    restart: "no"
+    volumes:
+      - data:/var/lib/cockroach
+    expose:
+      - "8080"
+      - "26257"
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+  nakama:
+    image: heroiclabs/nakama:3.22.0
+    entrypoint:
+      - "/bin/sh"
+      - "-ecx"
+      - |
+        /nakama/nakama migrate up --database.address root@cockroachdb:26257 &&
+        exec /nakama/nakama --name nakama1 --database.address root@cockroachdb:26257 --logger.level DEBUG --session.token_expiry_sec 7200 --metrics.prometheus_port 9100 --runtime.path /nakama/modules/build
+    restart: "no"
+    links:
+      - "cockroachdb:db"
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+      prometheus:
+        condition: service_started
+    volumes:
+      # 日志等数据目录（相对 compose 文件所在目录）
+      - ./:/nakama/data
+      # 宿主机：/opt/nakama/modules/build/index.js -> 容器：/nakama/modules/build/index.js（runtime.path 指向含 index.js 的目录）
+      - /opt/nakama/modules:/nakama/modules:ro
+    expose:
+      - "7349"
+      - "7350"
+      - "7351"
+      - "9100"
+    ports:
+      - "7349:7349"
+      - "7350:7350"
+      - "7351:7351"
+    healthcheck:
+      test: ["CMD", "/nakama/nakama", "healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  prometheus:
+    image: prom/prometheus
+    entrypoint: /bin/sh -c
+    command: |
+      'sh -s <<EOF
+        cat > ./prometheus.yml <<EON
+      global:
+        scrape_interval:     15s
+        evaluation_interval: 15s
+
+      scrape_configs:
+        - job_name: prometheus
+          static_configs:
+          - targets: ['localhost:9091']
+
+        - job_name: nakama
+          metrics_path: /
+          static_configs:
+          - targets: ['nakama:9100']
+      EON
+      prometheus --config.file=./prometheus.yml
+      EOF'      
+    ports:
+      - "9090:9090"
+volumes:
+  data:

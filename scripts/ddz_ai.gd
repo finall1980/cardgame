@@ -81,27 +81,16 @@ static func hand_landlord_strength(hand: PackedInt32Array) -> float:
 	return s
 
 
+## 仅 0 不叫 / 1 叫地主（与联网权威服一致）
 static func choose_bid(hand: PackedInt32Array, style: int = AI_STYLE_NORMAL) -> int:
 	var s: float = hand_landlord_strength(hand)
-	var t1: float = 15.0
-	var t2: float = 24.0
-	var t3: float = 34.0
+	var t: float = 20.0
 	match style:
 		AI_STYLE_AGGRESSIVE:
-			t1 -= 3.5
-			t2 -= 3.0
-			t3 -= 2.5
+			t -= 3.5
 		AI_STYLE_PASSIVE:
-			t1 += 3.0
-			t2 += 3.5
-			t3 += 3.0
-	if s >= t3:
-		return 3
-	if s >= t2:
-		return 2
-	if s >= t1:
-		return 1
-	return 0
+			t += 3.0
+	return 1 if s >= t else 0
 
 
 static func choose_rob_landlord(hand: PackedInt32Array, current_multiplier: int, style: int = AI_STYLE_NORMAL) -> bool:

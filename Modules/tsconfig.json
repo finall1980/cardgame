@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "rootDir": "./src",
+    "outFile": "./build/index.js",
+    "strict": true,
+    "skipLibCheck": true,
+    "typeRoots": ["./node_modules"],
+    "types": ["nakama-runtime"],
+    "ignoreDeprecations": "6.0"
+  },
+  "files": ["./src/main.ts", "./src/ddz_ai_server.ts"]
+}

@@ -10,6 +10,9 @@ export_presets.cfg
 data_*/
 mono_crash.*.json
 
+# Docker / 部署
+.env
+
 # OS / editor
 .DS_Store
 *.swp
@@ -25,3 +28,7 @@ WebApp/.dev_https/
 
 # Godot HTML5 导出目录（含 .pck/.wasm 等，体积大，不纳入版本库）
 /WebApp/
+
+# Windows 导出 / Android 预编译 AAR（单文件常超 GitHub 100MB 限制）
+/Windows/
+/android/build/libs/

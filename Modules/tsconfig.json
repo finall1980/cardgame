@@ -5,9 +5,32 @@
     "outFile": "./build/index.js",
     "strict": true,
     "skipLibCheck": true,
-    "typeRoots": ["./node_modules"],
-    "types": ["nakama-runtime"],
     "ignoreDeprecations": "6.0"
   },
-  "files": ["./src/main.ts", "./src/ddz_ai_server.ts"]
+  "files": [
+    "./src/nakama_env.d.ts",
+    "./src/core/random.ts",
+    "./src/core/rpc_json.ts",
+    "./src/core/wallet.ts",
+    "./src/core/storage_queue.ts",
+    "./src/games/ddz/match_state.ts",
+    "./src/games/ddz/rules.ts",
+    "./src/games/ddz/match_logic.ts",
+    "./src/games/ddz/match_handler.ts",
+    "./src/games/ddz/mm_queue.ts",
+    "./src/games/guandan/match_state.ts",
+    "./src/games/guandan/rules.ts",
+    "./src/games/guandan/match_logic.ts",
+    "./src/games/guandan/match_handler.ts",
+    "./src/games/guandan/mm_queue.ts",
+    "./src/games/meow_kill/rules.ts",
+    "./src/games/meow_kill/match_state.ts",
+    "./src/games/meow_kill/ai_logic.ts",
+    "./src/games/meow_kill/match_logic.ts",
+    "./src/games/meow_kill/match_handler.ts",
+    "./src/games/meow_kill/mm_queue.ts",
+    "./src/main.ts",
+    "./src/games/ddz/ai_server.ts",
+    "./src/games/guandan/ai_server.ts"
+  ]
 }

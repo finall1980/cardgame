@@ -2,6 +2,8 @@ extends Control
 
 @onready var _hub: Node = get_node("/root/OnlineSession")
 @onready var _btn_match: Button = %BtnMatchNow
+@onready var _btn_guandan_match: Button = get_node_or_null("%BtnGuandanMatch")
+@onready var _btn_meow_kill_match: Button = get_node_or_null("%BtnMeowKillMatch")
 @onready var _match_status: Label = %MatchStatusLabel
 @onready var _match_timer_lbl: Label = %MatchTimerLabel
 @onready var _lbl_username: Label = %LblProfileUsername
@@ -10,7 +12,10 @@ extends Control
 @onready var _lbl_location: Label = %LblProfileLocation
 @onready var _lbl_created: Label = %LblProfileCreated
 @onready var _lbl_wallet: Label = %LblWalletCoins
-@onready var _btn_buy_coins: Button = %BtnBuyCoins
+@onready var _btn_wallet: Button = %BtnBuyCoins
+@onready var _edit_display_name: LineEdit = %EditProfileDisplayName
+@onready var _edit_location: LineEdit = %EditProfileLocation
+@onready var _btn_save_profile: Button = %BtnSaveProfile
 @onready var _chat_log: RichTextLabel = %LobbyChatLog
 @onready var _chat_input: LineEdit = %LobbyChatInput
 @onready var _btn_send: Button = %BtnLobbyChatSend
@@ -25,8 +30,10 @@ func _ready() -> void:
 	_match_status.text = ""
 	_match_timer_lbl.text = "0 秒"
 	_match_timer_lbl.visible = false
-	if _btn_buy_coins:
-		_btn_buy_coins.pressed.connect(_on_buy_coins_pressed)
+	if _btn_wallet:
+		_btn_wallet.pressed.connect(_on_wallet_button_pressed)
+	if _btn_save_profile:
+		_btn_save_profile.pressed.connect(_on_save_profile_pressed)
 	_hub.matchmaker_succeeded.connect(_on_matchmaker_succeeded)
 	_hub.online_match_join_failed.connect(_on_online_match_join_failed)
 	if _hub.has_signal("lobby_chat_received"):
@@ -39,15 +46,27 @@ func _on_lobby_chat_received(username: String, text: String, _sender_id: String)
 	_append_chat_line(username, text)
 
 
+func _lobby_escape_bb(s: String) -> String:
+	return s.replace("[", "(").replace("]", ")")
+
+
 func _append_chat_line(username: String, text: String) -> void:
 	if _chat_log == null:
 		return
 	var line: String = text.replace("\n", " ").replace("\r", "")
-	_chat_log.append_text("[%s] %s\n" % [username, line])
+	var un: String = _lobby_escape_bb(username)
+	_chat_log.append_text("[color=#e8c478][b]%s[/b][/color]  %s\n" % [un, _lobby_escape_bb(line)])
 	_chat_line_count += 1
 	if _chat_line_count > 200:
 		_chat_log.clear()
 		_chat_line_count = 0
+
+
+func _sync_edit_fields_from_hub() -> void:
+	if _edit_display_name:
+		_edit_display_name.text = _hub.profile_display_name
+	if _edit_location:
+		_edit_location.text = _hub.profile_location
 
 
 func _refresh_profile_labels() -> void:
@@ -67,21 +86,49 @@ func _refresh_profile_labels() -> void:
 		ct = _format_iso_time(ct)
 	if _lbl_created:
 		_lbl_created.text = "注册时间：%s" % ct
+	_sync_edit_fields_from_hub()
 	if _lbl_wallet:
 		await _hub.sync_wallet_async()
 		_lbl_wallet.text = "游戏币：%d" % int(_hub.wallet_coins)
+	_update_wallet_button_visibility()
 
 
-func _on_buy_coins_pressed() -> void:
-	if _btn_buy_coins:
-		_btn_buy_coins.disabled = true
-	var err: String = await _hub.buy_coins_async()
+func _update_wallet_button_visibility() -> void:
+	if _btn_wallet == null:
+		return
+	var c: int = int(_hub.wallet_coins)
+	if c <= 0:
+		_btn_wallet.visible = true
+		_btn_wallet.disabled = false
+		_btn_wallet.text = "重置积分"
+	else:
+		_btn_wallet.visible = false
+
+
+func _on_wallet_button_pressed() -> void:
+	if _btn_wallet:
+		_btn_wallet.disabled = true
+	var err: String = await _hub.reset_wallet_if_empty_async()
 	if _lbl_wallet:
 		_lbl_wallet.text = "游戏币：%d" % int(_hub.wallet_coins)
-	if _btn_buy_coins:
-		_btn_buy_coins.disabled = false
+	_update_wallet_button_visibility()
+	if _btn_wallet and int(_hub.wallet_coins) <= 0:
+		_btn_wallet.disabled = false
 	if not err.is_empty():
-		push_warning("购买游戏币: %s" % err)
+		push_warning("积分重置: %s" % err)
+
+
+func _on_save_profile_pressed() -> void:
+	if _btn_save_profile:
+		_btn_save_profile.disabled = true
+	var dn: String = _edit_display_name.text if _edit_display_name else ""
+	var loc: String = _edit_location.text if _edit_location else ""
+	var err: String = await _hub.update_profile_fields_async(dn, loc)
+	if not err.is_empty():
+		push_warning("保存资料: %s" % err)
+	await _refresh_profile_labels()
+	if _btn_save_profile:
+		_btn_save_profile.disabled = false
 
 
 func _format_iso_time(s: String) -> String:
@@ -95,7 +142,7 @@ func _setup_lobby_chat() -> void:
 		return
 	if not await _hub.join_lobby_chat_async():
 		if _chat_log:
-			_chat_log.add_text("[系统] 大厅聊天暂时无法连接，请稍后再试。\n")
+			_chat_log.append_text("[color=#98b8a8][系统][/color]  大厅聊天暂时无法连接，请稍后再试。\n")
 		return
 	_chat_setup_done = true
 	var hist: Array = await _hub.fetch_lobby_chat_history_async(50)
@@ -156,7 +203,13 @@ func _on_matchmaker_succeeded() -> void:
 	_match_status.text = "已匹配成功！即将进入游戏..."
 	await get_tree().create_timer(2.0).timeout
 	await _hub.leave_lobby_chat_async()
-	get_tree().change_scene_to_file("res://scenes/online_match.tscn")
+	var game_id: String = _hub.current_game_id if "current_game_id" in _hub else "ddz"
+	if game_id == "guandan":
+		get_tree().change_scene_to_file("res://scenes/guandan/main.tscn")
+	elif game_id == "meow_kill":
+		get_tree().change_scene_to_file("res://scenes/meow_kill/main.tscn")
+	else:
+		get_tree().change_scene_to_file("res://scenes/online_match.tscn")
 
 
 func _on_online_match_join_failed() -> void:
@@ -167,6 +220,10 @@ func _on_online_match_join_failed() -> void:
 
 func _set_match_busy(busy: bool) -> void:
 	_btn_match.disabled = busy
+	if _btn_guandan_match != null:
+		_btn_guandan_match.disabled = busy
+	if _btn_meow_kill_match != null:
+		_btn_meow_kill_match.disabled = busy
 
 
 func _ensure_sec_timer() -> void:
@@ -205,9 +262,61 @@ func _on_btn_match_now_pressed() -> void:
 	await get_tree().create_timer(0.5).timeout
 	_match_status.text = "正在匹配中，请稍候…"
 	var err: String = await _hub.start_matchmaking_authoritative_async()
+	if err == "matching_interrupted":
+		_stop_match_wait_timer()
+		_set_match_busy(false)
+		return
 	if not err.is_empty():
 		_stop_match_wait_timer()
 		push_warning("匹配: %s" % err)
+		var short_err: String = err
+		if short_err.length() > 72:
+			short_err = short_err.substr(0, 69) + "…"
+		_match_status.text = "匹配失败：%s" % short_err
+		_set_match_busy(false)
+		return
+	if _hub.is_in_online_match():
+		_stop_match_wait_timer()
+
+
+func _on_btn_guandan_match_pressed() -> void:
+	_match_status.text = "正在准备掼蛋匹配…"
+	_set_match_busy(true)
+	_start_match_wait_timer()
+	await get_tree().create_timer(0.5).timeout
+	_match_status.text = "正在匹配 4 人掼蛋，请稍候…"
+	var err: String = await _hub.start_guandan_matchmaking_async()
+	if err == "matching_interrupted":
+		_stop_match_wait_timer()
+		_set_match_busy(false)
+		return
+	if not err.is_empty():
+		_stop_match_wait_timer()
+		push_warning("掼蛋匹配: %s" % err)
+		var short_err: String = err
+		if short_err.length() > 72:
+			short_err = short_err.substr(0, 69) + "…"
+		_match_status.text = "匹配失败：%s" % short_err
+		_set_match_busy(false)
+		return
+	if _hub.is_in_online_match():
+		_stop_match_wait_timer()
+
+
+func _on_btn_meow_kill_match_pressed() -> void:
+	_match_status.text = "正在准备猫猫杀匹配…"
+	_set_match_busy(true)
+	_start_match_wait_timer()
+	await get_tree().create_timer(0.5).timeout
+	_match_status.text = "正在匹配 5 人猫猫杀（约 10 秒未满则由牌手补位）…"
+	var err: String = await _hub.start_meow_kill_matchmaking_async(5)
+	if err == "matching_interrupted":
+		_stop_match_wait_timer()
+		_set_match_busy(false)
+		return
+	if not err.is_empty():
+		_stop_match_wait_timer()
+		push_warning("猫猫杀匹配: %s" % err)
 		var short_err: String = err
 		if short_err.length() > 72:
 			short_err = short_err.substr(0, 69) + "…"
@@ -227,7 +336,7 @@ func _on_btn_join_room_pressed() -> void:
 
 
 func _on_btn_back_to_login_pressed() -> void:
-	_hub.cancel_matchmaking_async()
+	await _hub.cancel_matchmaking_async()
 	await _hub.leave_lobby_chat_async()
 	_hub.clear_session()
 	get_tree().change_scene_to_file("res://scenes/start_menu.tscn")

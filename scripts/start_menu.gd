@@ -9,15 +9,11 @@ const _MAX_DISPLAY_NAME_LEN := 128
 const _AUTH_LABEL_NEUTRAL := Color(0.82, 0.94, 0.88, 1)
 
 @onready var _hub: Node = get_node("/root/OnlineSession")
-@onready var _bottom_dock: Control = $BottomDock
-@onready var _menu_cols_hbox: HBoxContainer = %MenuColsHBox
-@onready var _menu_col_left: VBoxContainer = %MenuColLeft
-@onready var _menu_col_right: VBoxContainer = %MenuColRight
 @onready var _bgm: AudioStreamPlayer = %BgmPlayer
-@onready var _btn_single: TextureButton = %BtnSinglePlayer
-@onready var _btn_online: TextureButton = %BtnOnline
-@onready var _btn_settings: TextureButton = %BtnSettings
-@onready var _btn_leaderboard: TextureButton = %BtnLeaderboard
+@onready var _btn_single: Button = %BtnSinglePlayer
+@onready var _btn_online: Button = %BtnOnline
+@onready var _btn_settings: Button = %BtnSettings
+@onready var _btn_exit: Button = %BtnExit
 @onready var _bgm_volume_slider: HSlider = %BgmVolumeSlider
 @onready var _auth_overlay: CanvasLayer = %AuthOverlay
 @onready var _auth_title: Label = %AuthPopupTitle
@@ -38,14 +34,12 @@ const _AUTH_LABEL_NEUTRAL := Color(0.82, 0.94, 0.88, 1)
 var _register_mode: bool = false
 const _REMEMBER_CFG_PATH := "user://login_remember.cfg"
 var _dlg_soon: AcceptDialog
-## 首页四键：贴图约 700px 宽，须 ignore_texture_size 才能用自定义格子尺寸。
-const _HOME_MENU_BTN_BASE := Vector2(158, 30)
-## 相对 _HOME_MENU_BTN_BASE 的倍数（原为 6，现为一半 → 3）
-const _HOME_MENU_BTN_SCALE := 3.0
-const _GRID_H_SEP := 5
-const _GRID_V_SEP := 8
-## 与 BottomDock 的 offset_left+offset_right 一致（左右各 12）
-const _HOME_MENU_DOCK_H_MARGIN := 24.0
+## 四枚透明热区平铺在背景图底部按钮上（与 start.png 中横条大致对齐，可按分辨率改 anchor）
+const _HOME_MENU_HIT_MIN_H := 44.0
+const _HOME_MENU_HIT_MAX_H := 96.0
+const _HOME_MENU_HIT_H_FRAC := 0.09
+## 最窄一列宽度下限，HBox 会均分整行剩余宽度
+const _HOME_MENU_HIT_MIN_W := 40.0
 
 
 func _ready() -> void:
@@ -60,7 +54,7 @@ func _ready() -> void:
 	_btn_single.pressed.connect(_on_single_player_pressed)
 	_btn_online.pressed.connect(_on_online_pressed)
 	_btn_settings.pressed.connect(func() -> void: _show_soon_dialog("设置"))
-	_btn_leaderboard.pressed.connect(func() -> void: _show_soon_dialog("积分榜"))
+	_btn_exit.pressed.connect(_on_exit_game_pressed)
 	_pop_login.pressed.connect(_on_popup_login_pressed)
 	_pop_to_register.pressed.connect(_show_register_panel)
 	_pop_register_submit.pressed.connect(_on_popup_register_submit_pressed)
@@ -86,39 +80,14 @@ func _on_bgm_volume_slider_changed(value: float) -> void:
 	_apply_bgm_volume_percent(value)
 
 
-func _home_menu_cell_size() -> Vector2:
-	var vw: float = get_viewport().get_visible_rect().size.x
-	## 首帧视口宽度可能尚未就绪，避免算出极小宽度把布局锁死
-	if vw < 64.0:
-		vw = maxf(vw, float(DisplayServer.screen_get_size().x))
-	if vw <= _HOME_MENU_DOCK_H_MARGIN + float(_GRID_H_SEP) + 4.0:
-		return _HOME_MENU_BTN_BASE
-	var w_desired: float = _HOME_MENU_BTN_BASE.x * _HOME_MENU_BTN_SCALE
-	## 两列 + 中间缝 + BottomDock 左右 offset，能放下 w_desired 才用目标尺寸；否则再压窄（窄屏）
-	var min_vw_for_target: float = 2.0 * w_desired + float(_GRID_H_SEP) + _HOME_MENU_DOCK_H_MARGIN
-	var per_col_if_shrink: float = (vw - _HOME_MENU_DOCK_H_MARGIN - float(_GRID_H_SEP)) * 0.5
-	var w: float = w_desired if vw >= min_vw_for_target else maxf(_HOME_MENU_BTN_BASE.x, per_col_if_shrink)
-	var h: float = w * _HOME_MENU_BTN_BASE.y / _HOME_MENU_BTN_BASE.x
-	return Vector2(w, h)
-
-
 func _apply_home_menu_button_sizing() -> void:
-	var cell: Vector2 = _home_menu_cell_size()
-	var btns: Array[TextureButton] = [_btn_single, _btn_online, _btn_settings, _btn_leaderboard]
+	var vh: float = get_viewport().get_visible_rect().size.y
+	if vh < 32.0:
+		vh = maxf(vh, float(DisplayServer.screen_get_size().y))
+	var hit_h: float = clampf(vh * _HOME_MENU_HIT_H_FRAC, _HOME_MENU_HIT_MIN_H, _HOME_MENU_HIT_MAX_H)
+	var btns: Array[Button] = [_btn_single, _btn_online, _btn_settings, _btn_exit]
 	for b in btns:
-		b.ignore_texture_size = true
-		b.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-		b.custom_minimum_size = cell
-		## 避免 VBox 子项默认 FILL 把可点区域拉满整列导致「中间一大块空」
-		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var col_h: float = cell.y * 2.0 + float(_GRID_V_SEP)
-	_menu_col_left.custom_minimum_size = Vector2(cell.x, col_h)
-	_menu_col_right.custom_minimum_size = Vector2(cell.x, col_h)
-	## MenuColsHBox 铺满 BottomDock，靠 HBox alignment=CENTER 把两窄列整体居中，中间仅 separation（5px）
-	_menu_cols_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	var total_h: float = col_h + 18.0
-	_bottom_dock.offset_top = -total_h
+		b.custom_minimum_size = Vector2(_HOME_MENU_HIT_MIN_W, hit_h)
 
 
 func _show_soon_dialog(feature_name: String) -> void:
@@ -129,6 +98,10 @@ func _show_soon_dialog(feature_name: String) -> void:
 func _on_single_player_pressed() -> void:
 	_hub.begin_offline_play()
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
+
+
+func _on_exit_game_pressed() -> void:
+	get_tree().quit()
 
 
 func _on_online_pressed() -> void:
@@ -352,7 +325,7 @@ func _set_auth_overlay_busy(busy: bool) -> void:
 	_btn_single.disabled = busy
 	_btn_online.disabled = busy
 	_btn_settings.disabled = busy
-	_btn_leaderboard.disabled = busy
+	_btn_exit.disabled = busy
 	if _cb_remember:
 		_cb_remember.disabled = busy
 

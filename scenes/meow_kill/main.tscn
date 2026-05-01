@@ -1,0 +1,593 @@
+[gd_scene load_steps=3 format=3 uid="uid://cmeowkillmain001"]
+
+[ext_resource type="Script" path="res://scripts/meow_kill/main.gd" id="1_main"]
+[ext_resource type="Texture2D" path="res://meowkill/system/tableBg.jpg" id="2_tablebg"]
+
+[node name="MeowKillMain" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Bg" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_tablebg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="TableShell" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -150.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopHud" type="ColorRect" parent="TableShell"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 44.0
+grow_horizontal = 2
+color = Color(0.12, 0.11, 0.14, 0.94)
+
+[node name="TopHudLabel" type="Label" parent="TableShell/TopHud"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.92, 0.84, 0.58, 1)
+theme_override_font_sizes/font_size = 13
+text = "回合与阶段"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CenterPlay" type="ColorRect" parent="TableShell"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -120.0
+offset_right = 200.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.14, 0.13, 0.65)
+
+[node name="CenterVBox" type="VBoxContainer" parent="TableShell/CenterPlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="PileRow" type="HBoxContainer" parent="TableShell/CenterPlay/CenterVBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="DeckCountLbl" type="Label" parent="TableShell/CenterPlay/CenterVBox/PileRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.82, 0.74, 1)
+theme_override_font_sizes/font_size = 12
+text = "牌堆 · 0"
+
+[node name="DiscardCountLbl" type="Label" parent="TableShell/CenterPlay/CenterVBox/PileRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.82, 0.74, 1)
+theme_override_font_sizes/font_size = 12
+text = "弃牌 · 0"
+
+[node name="PlayAreaHBox" type="HBoxContainer" parent="TableShell/CenterPlay/CenterVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="JudgeLbl" type="Label" parent="TableShell/CenterPlay/CenterVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.6, 0.58, 1)
+theme_override_font_sizes/font_size = 11
+text = "判定区（M1 未启用）"
+horizontal_alignment = 1
+
+[node name="CenterPlayLbl" type="Label" parent="TableShell/CenterPlay"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -34.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.75, 0.8, 0.72, 0.95)
+theme_override_font_sizes/font_size = 12
+text = "出牌区 / 询问"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlaqueD0" type="PanelContainer" parent="TableShell"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.28
+anchor_top = 0.68
+anchor_right = 0.72
+anchor_bottom = 0.96
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlaqueD0Lbl" type="Label" parent="TableShell/PlaqueD0"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_font_sizes/font_size = 13
+text = "相对0·本家"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlaqueD1" type="PanelContainer" parent="TableShell"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -128.0
+offset_right = -10.0
+offset_top = -74.0
+offset_bottom = 74.0
+grow_vertical = 2
+
+[node name="PlaqueD1Lbl" type="Label" parent="TableShell/PlaqueD1"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_font_sizes/font_size = 12
+text = "相对1·右"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlaqueD2" type="PanelContainer" parent="TableShell"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -128.0
+offset_right = -10.0
+offset_top = 52.0
+offset_bottom = 200.0
+grow_horizontal = 2
+
+[node name="PlaqueD2Lbl" type="Label" parent="TableShell/PlaqueD2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_font_sizes/font_size = 12
+text = "相对2·上右"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlaqueD3" type="PanelContainer" parent="TableShell"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 10.0
+offset_right = 128.0
+offset_top = 52.0
+offset_bottom = 200.0
+grow_horizontal = 2
+
+[node name="PlaqueD3Lbl" type="Label" parent="TableShell/PlaqueD3"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_font_sizes/font_size = 12
+text = "相对3·上左"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlaqueD4" type="PanelContainer" parent="TableShell"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_left = 0.0
+anchor_top = 0.5
+anchor_right = 0.0
+anchor_bottom = 0.5
+offset_left = 10.0
+offset_right = 128.0
+offset_top = -74.0
+offset_bottom = 74.0
+grow_vertical = 2
+
+[node name="PlaqueD4Lbl" type="Label" parent="TableShell/PlaqueD4"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_font_sizes/font_size = 12
+text = "相对4·左"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SidePanel" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 8
+
+[node name="SideVBox" type="VBoxContainer" parent="SidePanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LogHeader" type="Label" parent="SidePanel/SideVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.66, 0.58, 1)
+theme_override_font_sizes/font_size = 10
+text = "牌局"
+
+[node name="SnapshotLog" type="RichTextLabel" parent="SidePanel/SideVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 120)
+theme_override_colors/default_color = Color(0.88, 0.86, 0.8, 1)
+theme_override_font_sizes/normal_font_size = 10
+bbcode_enabled = true
+scroll_active = true
+fit_content = false
+
+[node name="ChatHeader" type="Label" parent="SidePanel/SideVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.66, 0.58, 1)
+theme_override_font_sizes/font_size = 10
+text = "聊天"
+
+[node name="ChatLog" type="RichTextLabel" parent="SidePanel/SideVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 72)
+theme_override_colors/default_color = Color(0.82, 0.88, 0.9, 1)
+theme_override_font_sizes/normal_font_size = 10
+bbcode_enabled = true
+scroll_active = true
+fit_content = false
+
+[node name="ChatRow" type="HBoxContainer" parent="SidePanel/SideVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ChatLineEdit" type="LineEdit" parent="SidePanel/SideVBox/ChatRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 10
+placeholder_text = "消息…"
+
+[node name="ChatSend" type="Button" parent="SidePanel/SideVBox/ChatRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "发"
+
+[node name="OpsHeader" type="Label" parent="SidePanel/SideVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.66, 0.58, 1)
+theme_override_font_sizes/font_size = 10
+text = "操作 / 提示"
+
+[node name="ActionHint" type="Label" parent="SidePanel/SideVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+theme_override_colors/font_color = Color(0.78, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 10
+autowrap_mode = 3
+text = "点选手牌后，在牌上方确认栏确认出牌。"
+
+[node name="GameActions" type="VBoxContainer" parent="SidePanel/SideVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BtnConfirmIdentity" type="Button" parent="SidePanel/SideVBox/GameActions"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "确认身份"
+
+[node name="BtnAiDelegate" type="Button" parent="SidePanel/SideVBox/GameActions"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "AI托管"
+
+[node name="BtnEndPlay" type="Button" parent="SidePanel/SideVBox/GameActions"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "结束出牌"
+
+[node name="RowJink" type="HBoxContainer" parent="SidePanel/SideVBox/GameActions"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EdJinkIdx" type="LineEdit" parent="SidePanel/SideVBox/GameActions/RowJink"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 10
+placeholder_text = "闪"
+
+[node name="BtnJinkYes" type="Button" parent="SidePanel/SideVBox/GameActions/RowJink"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "闪"
+
+[node name="BtnJinkNo" type="Button" parent="SidePanel/SideVBox/GameActions/RowJink"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "否"
+
+[node name="RowDying" type="HBoxContainer" parent="SidePanel/SideVBox/GameActions"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EdPeachIdx" type="LineEdit" parent="SidePanel/SideVBox/GameActions/RowDying"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 10
+placeholder_text = "桃"
+
+[node name="BtnPeachDying" type="Button" parent="SidePanel/SideVBox/GameActions/RowDying"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "救"
+
+[node name="BtnPassDying" type="Button" parent="SidePanel/SideVBox/GameActions/RowDying"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "不救"
+
+[node name="RowDiscard" type="HBoxContainer" parent="SidePanel/SideVBox/GameActions"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EdDiscard" type="LineEdit" parent="SidePanel/SideVBox/GameActions/RowDiscard"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 10
+placeholder_text = "0,1"
+
+[node name="BtnDiscard" type="Button" parent="SidePanel/SideVBox/GameActions/RowDiscard"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "弃"
+
+[node name="BtnBackLobby" type="Button" parent="SidePanel/SideVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "返回大厅"
+
+[node name="HandLayer" type="CanvasLayer" parent="."]
+layer = 48
+
+[node name="HandAnchor" type="Control" parent="HandLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -150.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="LocalPlayerRoot" type="MarginContainer" parent="HandLayer/HandAnchor"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -210.0
+offset_right = -12.0
+offset_bottom = -10.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="LocalPlayerHBox" type="HBoxContainer" parent="HandLayer/HandAnchor/LocalPlayerRoot"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="HandBlock" type="VBoxContainer" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="PhaseStrip" type="TextureRect" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/HandBlock"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 28)
+size_flags_horizontal = 3
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ConfirmBar" type="PanelContainer" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/HandBlock"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 24)
+
+[node name="ConfirmBarInner" type="HBoxContainer" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/HandBlock/ConfirmBar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ConfirmHint" type="Label" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/HandBlock/ConfirmBar/ConfirmBarInner"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.85, 0.92, 0.8, 1)
+theme_override_font_sizes/font_size = 11
+text = "点选手牌，在此确认出牌"
+vertical_alignment = 1
+
+[node name="BtnSlashCancelTarget" type="Button" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/HandBlock/ConfirmBar/ConfirmBarInner"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "重选目标"
+
+[node name="BtnHandConfirm" type="Button" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/HandBlock/ConfirmBar/ConfirmBarInner"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+disabled = true
+text = "确认出牌"
+
+[node name="BtnHandClear" type="Button" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/HandBlock/ConfirmBar/ConfirmBarInner"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "取消"
+
+[node name="HandStrip" type="HBoxContainer" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/HandBlock"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(320, 152)
+size_flags_vertical = 3
+alignment = 1
+theme_override_constants/separation = 6
+
+[node name="SelfRightColumn" type="VBoxContainer" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="SelfPortraitFrame" type="Control" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/SelfRightColumn"]
+custom_minimum_size = Vector2(96, 128)
+layout_mode = 2
+
+[node name="SelfPortrait" type="TextureRect" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/SelfRightColumn/SelfPortraitFrame"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SelfIdentityBadge" type="Label" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/SelfRightColumn/SelfPortraitFrame"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -34.0
+offset_top = 2.0
+offset_right = -2.0
+offset_bottom = 22.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 10
+text = "主公"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelfPhaseRibbon" type="Label" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/SelfRightColumn/SelfPortraitFrame"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -22.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 10
+text = "出牌阶段"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelfNameLbl" type="Label" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/SelfRightColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_font_sizes/font_size = 11
+text = "本家"
+horizontal_alignment = 1
+
+[node name="SelfHpRow" type="HBoxContainer" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/SelfRightColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 3
+
+[node name="SkillRow" type="HBoxContainer" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/SelfRightColumn"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 6
+
+[node name="BtnSkillA" type="Button" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/SelfRightColumn/SkillRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+disabled = true
+text = "技能"
+
+[node name="BtnSkillB" type="Button" parent="HandLayer/HandAnchor/LocalPlayerRoot/LocalPlayerHBox/SelfRightColumn/SkillRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+disabled = true
+text = "技能"

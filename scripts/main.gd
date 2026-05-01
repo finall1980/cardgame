@@ -46,6 +46,13 @@ const _CARD_W: float = 78.0
 const _CARD_H: float = 108.0
 const _FAN_STEP: float = 24.0
 const _HAND_BASE_Y: float = 12.0
+## 仅联网：左右对手整体向中间收拢（与场景默认 offset 叠加）
+const _ONLINE_OPP_SIDE_INSET_PX: float = 100.0
+## 联网对手背面牌：与真实张数一致、更密；单机仍用最多 8 张、原尺寸
+const _ONLINE_OPP_BACK_SEP: int = -22
+const _OFFLINE_OPP_BACK_SEP: int = -16
+const _ONLINE_OPP_BACK_SIZE := Vector2(30, 42)
+const _OFFLINE_OPP_BACK_SIZE := Vector2(38, 52)
 const _AI_THINK_SEC: float = 0.58
 const _AI_EXTRA_PAUSE_SEC: float = 0.22
 ## 联网对局：玩家出牌思考时间（秒）；超时跟牌自动「过」，首家必出时自动出推荐首出。
@@ -92,6 +99,8 @@ const _POST_DEAL_TO_BID_PAUSE_SEC: float = 1.0
 @onready var _opp_p1: HBoxContainer = %OppP1
 @onready var _opp_lbl2: Label = %OppLbl2
 @onready var _opp_lbl1: Label = %OppLbl1
+@onready var _left_opp_container: Control = $LeftOppContainer
+@onready var _right_opp_container: Control = $RightOppContainer
 @onready var _deal_fan: HBoxContainer = %DealCardFan
 @onready var _sfx: AudioStreamPlayer = $SfxPlayer
 @onready var _sfx_bomb: AudioStreamPlayer = %SfxBombPlayer
@@ -370,9 +379,12 @@ func _net_apply_settlement_ui_from_snapshot(d: Dictionary) -> void:
 			_settle_body.text = sbb
 		_settlement_layer.show()
 		_set_in_game_interactive(false)
-		var broke := _any_score_broke()
-		_btn_settle_continue.visible = not broke
-		_btn_settle_menu.visible = broke
+		if _server_authoritative:
+			_svr_settlement_show_both_buttons()
+		else:
+			var broke := _any_score_broke()
+			_btn_settle_continue.visible = not broke
+			_btn_settle_menu.visible = broke
 	else:
 		_settlement_layer.hide()
 
@@ -992,6 +1004,7 @@ func _srv_refresh_settlement_continue_line() -> void:
 		var mys: int = _local_seat()
 		var mine_ready: bool = mys >= 0 and mys < _srv_continue_ready.size() and _srv_continue_ready[mys]
 		_btn_settle_continue.disabled = mine_ready
+	_svr_settlement_show_both_buttons()
 
 
 func _srv_deferred_fetch_nicks() -> void:
@@ -1068,11 +1081,7 @@ func _srv_settlement_intro_async() -> void:
 		_settle_body.text = _format_settlement_bbcode()
 	if _settlement_layer:
 		_settlement_layer.visible = true
-	var broke := _any_score_broke()
-	if _btn_settle_continue:
-		_btn_settle_continue.visible = not broke
-	if _btn_settle_menu:
-		_btn_settle_menu.visible = broke
+	_svr_settlement_show_both_buttons()
 	_settlement_shown = true
 	_srv_refresh_settlement_continue_line()
 	_srv_settlement_intro_running = false
@@ -1221,6 +1230,9 @@ func _ready() -> void:
 		_my_net_seat = 0
 		if hub0 != null and hub0.has_signal("match_ddz_server"):
 			hub0.match_ddz_server.connect(_on_srv_ddz_message)
+			## 进场景后、重放缓冲前：提示加载；重放若含快照会由 `_refresh_ui` 覆盖，切勿在重放后再写死本行（否则会一直卡在「等待同步」）。
+			if _status:
+				_status.text = "[center][color=#c8e8d8]等待服务器同步…[/color][/center]"
 			## 大厅等待期间已下发的快照会进 OnlineSession 缓冲，此处重放以免无手牌。
 			if hub0.has_method("replay_rt_ddz_buffer"):
 				_srv_last_seq = -1
@@ -1239,8 +1251,6 @@ func _ready() -> void:
 		add_to_group("ddz_game_main")
 		if _title:
 			_title.text = "斗地主 · 联网（服务端权威）"
-		if _status:
-			_status.text = "[center][color=#c8e8d8]等待服务器同步…[/color][/center]"
 		var chat_dock := get_node_or_null("ChatDock")
 		if chat_dock:
 			chat_dock.visible = true
@@ -1275,6 +1285,8 @@ func _ready() -> void:
 	if _online_battle and hub0 != null and hub0.has_signal("match_rt_disconnected"):
 		hub0.match_rt_disconnected.connect(_on_net_match_rt_disconnected)
 	set_process(_online_battle)
+	if _online_battle:
+		_apply_online_side_opponent_layout()
 	if _bgm_slider:
 		_bgm_slider.value_changed.connect(_on_bgm_volume_changed)
 	if _sfx_bomb and _sfx_bomb_stream:
@@ -1377,6 +1389,28 @@ func _should_return_to_lobby() -> bool:
 		return true
 	var hub: Node = get_node_or_null("/root/OnlineSession")
 	return _online_battle and hub != null and hub.has_method("is_logged_in") and hub.is_logged_in()
+
+
+## 服务端权威：结算层「继续」与「返回大厅」并列（非破产时也可回大厅，不扣币；扣币仅见设置菜单中断比赛）。
+func _svr_settlement_show_both_buttons() -> void:
+	if not _server_authoritative:
+		return
+	if _btn_settle_continue:
+		_btn_settle_continue.visible = true
+	if _btn_settle_menu:
+		_btn_settle_menu.visible = true
+
+
+func _configure_return_menu_dialog() -> void:
+	if _server_authoritative and _srv_phase != "finished":
+		_dlg_confirm_menu.title = "返回大厅"
+		_dlg_confirm_menu.dialog_text = "中断比赛回到大厅将扣除 %d 游戏币（积分）。是否继续？" % int(OnlineSession.ABANDON_MATCH_COIN_PENALTY)
+	elif _should_return_to_lobby():
+		_dlg_confirm_menu.title = "返回大厅"
+		_dlg_confirm_menu.dialog_text = "是否返回联机大厅？当前对局将结束。"
+	else:
+		_dlg_confirm_menu.title = "返回开始界面"
+		_dlg_confirm_menu.dialog_text = "是否返回开始界面？当前对局将结束。"
 
 
 func _apply_styled_accept_dialog(dlg: AcceptDialog) -> void:
@@ -1754,18 +1788,42 @@ func _play_deal_sequence() -> void:
 	_set_in_game_interactive(true)
 
 
+func _apply_online_side_opponent_layout() -> void:
+	if not is_instance_valid(_left_opp_container) or not is_instance_valid(_right_opp_container):
+		return
+	_left_opp_container.offset_left += _ONLINE_OPP_SIDE_INSET_PX
+	_left_opp_container.offset_right += _ONLINE_OPP_SIDE_INSET_PX
+	_right_opp_container.offset_left -= _ONLINE_OPP_SIDE_INSET_PX
+	_right_opp_container.offset_right -= _ONLINE_OPP_SIDE_INSET_PX
+
+
+func _opp_back_layout_for_online() -> Dictionary:
+	if _online_battle:
+		return {"sep": _ONLINE_OPP_BACK_SEP, "size": _ONLINE_OPP_BACK_SIZE}
+	return {"sep": _OFFLINE_OPP_BACK_SEP, "size": _OFFLINE_OPP_BACK_SIZE}
+
+
 func _refresh_opp_strip_dealing(box: HBoxContainer, lbl: Label, n: int) -> void:
 	for c in box.get_children():
 		c.queue_free()
 	lbl.text = "%d张" % n
-	if n <= 0:
+	var lay: Dictionary = _opp_back_layout_for_online()
+	box.add_theme_constant_override("separation", int(lay["sep"]))
+	var sz: Vector2 = lay["size"]
+	var show_n: int
+	if _online_battle:
+		show_n = maxi(0, n)
+	else:
+		if n <= 0:
+			return
+		show_n = mini(8, maxi(1, n))
+	if show_n <= 0:
 		return
-	var show_n: int = mini(8, maxi(1, n))
 	for i in show_n:
 		var tr_back := TextureRect.new()
 		tr_back.texture = load(CardDefs.texture_path_back()) as Texture2D
 		tr_back.ignore_texture_size = true
-		tr_back.custom_minimum_size = Vector2(38, 52)
+		tr_back.custom_minimum_size = sz
 		tr_back.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 		tr_back.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		box.add_child(tr_back)
@@ -1884,11 +1942,14 @@ func _on_redeal_confirmed() -> void:
 
 
 func _on_settings_to_menu_pressed() -> void:
+	_configure_return_menu_dialog()
 	_dlg_confirm_menu.popup_centered()
 
 
 func _on_to_menu_confirmed() -> void:
 	_settlement_layer.hide()
+	if _server_authoritative and _srv_phase != "finished":
+		await OnlineSession.apply_wallet_delta_async(-OnlineSession.ABANDON_MATCH_COIN_PENALTY)
 	await _return_to_start_menu_async()
 
 
@@ -3194,13 +3255,23 @@ func _refresh_opponent_strips() -> void:
 	var n1: int = int(_hands[s_right].size())
 	_opp_lbl2.text = "%d张" % n2
 	_opp_lbl1.text = "%d张" % n1
-	var show2: int = mini(8, maxi(1, n2))
-	var show1: int = mini(8, maxi(1, n1))
+	var lay: Dictionary = _opp_back_layout_for_online()
+	_opp_p2.add_theme_constant_override("separation", int(lay["sep"]))
+	_opp_p1.add_theme_constant_override("separation", int(lay["sep"]))
+	var sz: Vector2 = lay["size"]
+	var show2: int
+	var show1: int
+	if _online_battle:
+		show2 = maxi(0, n2)
+		show1 = maxi(0, n1)
+	else:
+		show2 = mini(8, maxi(1, n2))
+		show1 = mini(8, maxi(1, n1))
 	for i in show2:
 		var tr2 := TextureRect.new()
 		tr2.texture = load(CardDefs.texture_path_back()) as Texture2D
 		tr2.ignore_texture_size = true
-		tr2.custom_minimum_size = Vector2(38, 52)
+		tr2.custom_minimum_size = sz
 		tr2.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 		tr2.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		_opp_p2.add_child(tr2)
@@ -3208,7 +3279,7 @@ func _refresh_opponent_strips() -> void:
 		var tr1 := TextureRect.new()
 		tr1.texture = load(CardDefs.texture_path_back()) as Texture2D
 		tr1.ignore_texture_size = true
-		tr1.custom_minimum_size = Vector2(38, 52)
+		tr1.custom_minimum_size = sz
 		tr1.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 		tr1.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		_opp_p1.add_child(tr1)

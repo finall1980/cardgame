@@ -14,7 +14,7 @@ const MATCH_OP_TURN_SYNC := 1
 const MATCH_OP_STATE_SNAPSHOT := 2
 ## 客人 → 房主：叫分 / 抢地主 / 出牌 / 过。
 const MATCH_OP_CLIENT_ACTION := 3
-## 服务端权威斗地主（Modules/main.ts），与上方 1/2/3 错开。
+## 服务端权威斗地主（`Modules` → `games/ddz/match_handler` 等），与上方 1/2/3 错开。
 const DDZ_OP_SNAPSHOT := 101
 const DDZ_OP_ERROR := 102
 const DDZ_OP_SETTLEMENT := 120
@@ -23,6 +23,62 @@ const DDZ_REQ_ROB := 11
 const DDZ_REQ_PLAY := 12
 const DDZ_REQ_PASS := 13
 const DDZ_REQ_CONTINUE := 14
+## 须与服务端 `registerMatch("<label>", …)` 一致；换玩法时同步改服务端并改 `RPC_MM_*` 前缀。
+const AUTHORITY_GAME_MATCH_LABEL := "ddz"
+## 自建匹配 ticket 前缀（须与 `Modules` 内 `games/ddz/mm_queue` 生成规则一致）。
+const MM_TICKET_PREFIX := "ddzmm_"
+## 掼蛋 RPC 队列车票前缀（与 `mm_queue.ts` 内 `gdmm_` 一致）。
+const GUANDAN_RPC_TICKET_PREFIX := "gdmm_"
+## 用户返回大厅等导致 `_start_mm_rpc_async` 主动结束时返回（非业务错误）。
+const MATCHMAKING_INTERRUPTED := "matching_interrupted"
+const RPC_MM_JOIN := "ddz_mm_join"
+const RPC_MM_POLL := "ddz_mm_poll"
+const RPC_MM_CANCEL := "ddz_mm_cancel"
+## 掼蛋（guandan）：label / ticket 前缀 / RPC；与 ddz 独立，不得串行。
+const GUANDAN_MATCH_LABEL := "guandan"
+const GUANDAN_MM_TICKET_PREFIX := "guandanmm_"
+const RPC_GUANDAN_MM_JOIN := "guandan_mm_join"
+const RPC_GUANDAN_MM_POLL := "guandan_mm_poll"
+const RPC_GUANDAN_MM_CANCEL := "guandan_mm_cancel"
+## 服务端权威掼蛋 opcode（与 DDZ_OP_* / GD_REQ_* 错开；须与 Modules/src/games/guandan/match_state 保持一致）。
+const GD_OP_SNAPSHOT := 201
+const GD_OP_ERROR := 202
+const GD_OP_HINT := 203
+const GD_OP_SETTLEMENT := 220
+const GD_REQ_PLAY := 30
+const GD_REQ_PASS := 31
+const GD_REQ_TRIBUTE := 32
+const GD_REQ_TRIBUTE_RESIST := 33
+const GD_REQ_RETURN := 34
+const GD_REQ_CONTINUE := 35
+const GD_REQ_DELEGATE := 38
+const GD_REQ_HINT := 39
+## 猫猫杀 meow_kill（须与 Modules/src/games/meow_kill/match_state.ts 一致）。
+const MEOW_KILL_MATCH_LABEL := "meow_kill"
+const MEOW_KILL_MM_TICKET_PREFIX := "mkmm_"
+const RPC_MEOW_KILL_MM_JOIN := "meow_kill_mm_join"
+const RPC_MEOW_KILL_MM_POLL := "meow_kill_mm_poll"
+const RPC_MEOW_KILL_MM_CANCEL := "meow_kill_mm_cancel"
+const MK_OP_SNAPSHOT := 301
+const MK_OP_ERROR := 302
+const MK_REQ_PING := 50
+const MK_REQ_PLAY_CARD := 52
+const MK_REQ_RESPOND_JINK := 53
+const MK_REQ_END_PLAY := 54
+const MK_REQ_DISCARD := 55
+const MK_REQ_PEACH_DYING := 56
+const MK_REQ_PASS_DYING := 57
+const MK_REQ_CONFIRM_IDENTITY := 58
+const MK_REQ_DELEGATE := 59
+const MK_REQ_CONFIRM_BREED := 60
+## 全游戏通用钱包（服务端 `core/wallet`）。
+const RPC_WALLET_SYNC := "wallet_sync"
+const RPC_WALLET_BUY := "wallet_buy"
+const RPC_WALLET_APPLY_DELTA := "wallet_apply_delta"
+## 联机对局中主动退回大厅时扣除的游戏币（与 `main.gd` 设置菜单确认一致）。
+const ABANDON_MATCH_COIN_PENALTY := 1000
+const _MATCH_CHAT_PREFIX := AUTHORITY_GAME_MATCH_LABEL + "_match_"
+const _MATCH_CHAT_MAX_NAME := 64
 ## 本机 Godot ENet 对局同步端口（与 Nakama 匹配独立；局域网可后续改为可配置 host）。
 const MATCH_ENET_PORT := 7645
 ## 服务端权威 DDZ：在「已 Join Match、主场景尚未连接 `match_ddz_server`」时缓存快照，进入对局后 `replay_rt_ddz_buffer()` 重放（避免大厅等待 2s 期间丢失首包）。
@@ -41,6 +97,9 @@ signal match_peer_left(user_id: String)
 signal match_rt_disconnected()
 ## 服务端权威 Match `ddz`：快照 / 错误 / 结算（payload 已 JSON 解析为 Dictionary）。
 signal match_ddz_server(op_code: int, data: Dictionary)
+## 服务端权威 Match `guandan`：同形式（见 GD_OP_*）。
+signal match_gd_server(op_code: int, data: Dictionary)
+signal match_meow_kill_server(op_code: int, data: Dictionary)
 
 var _client: NakamaClient
 ## 已通过 matchmaker 加入的 Nakama Match（用于联网对局信令；离开场景时应 leave）。
@@ -66,10 +125,18 @@ signal match_chat_received(p_username: String, p_text: String, p_sender_id: Stri
 
 var _rt_socket: NakamaSocket
 var _matchmaker_ticket: String = ""
+## 为 true 时尽快结束 `_start_mm_rpc_async`（避免 session 已清空仍调 `rpc_async`）。
+var _mm_abort_requested: bool = false
 var _enet_peer: ENetMultiplayerPeer
 var _ddz_rt_buffer: Array[Dictionary] = []
 ## Join 成功至 `replay_rt_ddz_buffer()` 之前为 true，重放后关断，避免 matchLoop 每 tick 把缓冲撑爆。
 var _ddz_rt_buffering: bool = false
+var _gd_rt_buffer: Array[Dictionary] = []
+var _gd_rt_buffering: bool = false
+var _mk_rt_buffer: Array[Dictionary] = []
+var _mk_rt_buffering: bool = false
+## 当前正在匹配/进行的玩法 id（"ddz" | "guandan" | "meow_kill" | ""），决定匹配完成后切到哪个主场景。
+var current_game_id: String = ""
 
 
 func get_client() -> NakamaClient:
@@ -90,6 +157,7 @@ func set_session(s: NakamaSession) -> void:
 
 
 func clear_session() -> void:
+	_mm_abort_requested = true
 	active_rt_match = null
 	lobby_channel_id = ""
 	match_chat_channel_id = ""
@@ -107,6 +175,10 @@ func clear_session() -> void:
 func close_realtime() -> void:
 	_ddz_rt_buffer.clear()
 	_ddz_rt_buffering = false
+	_gd_rt_buffer.clear()
+	_gd_rt_buffering = false
+	_mk_rt_buffer.clear()
+	_mk_rt_buffering = false
 	cleanup_match_enet_if_any()
 	active_rt_match = null
 	_matchmaker_ticket = ""
@@ -131,6 +203,7 @@ func close_realtime() -> void:
 func begin_offline_play() -> void:
 	clear_session()
 	offline_mode = true
+	current_game_id = ""
 
 
 func is_logged_in() -> bool:
@@ -168,15 +241,43 @@ func start_matchmaking_async() -> String:
 	return await start_matchmaking_with_count_async(2, 2)
 
 
-## 三人匹配：RPC 排队（`ddz_mm_*`），满 3 人即开；否则等待 20s 后由服务端 AI 补位。
+## 三人匹配：RPC 排队（`ddz_mm_*`），满 3 人即开；否则等待 10s 后由服务端 AI 补位。
 func start_matchmaking_authoritative_async() -> String:
+	current_game_id = "ddz"
+	return await _start_mm_rpc_async(RPC_MM_JOIN, RPC_MM_POLL)
+
+
+## 掼蛋匹配：RPC 排队（`guandan_mm_*`），满 4 人即开；否则等待 30s 后由服务端 AI 补位。
+func start_guandan_matchmaking_async() -> String:
+	current_game_id = "guandan"
+	return await _start_mm_rpc_async(RPC_GUANDAN_MM_JOIN, RPC_GUANDAN_MM_POLL)
+
+
+## 猫猫杀：`table_size` 为 5 或 8（对应服务端 `meow_kill_mm_join` 的 JSON `table`）。
+func start_meow_kill_matchmaking_async(table_size: int = 5) -> String:
+	current_game_id = "meow_kill"
+	var join_payload: String = ""
+	if table_size == 8:
+		join_payload = JSON.stringify({"table": 8})
+	return await _start_mm_rpc_async(RPC_MEOW_KILL_MM_JOIN, RPC_MEOW_KILL_MM_POLL, join_payload)
+
+
+## 通用自建匹配 RPC 流程：入队 → 轮询（1s/次）→ matched 后 join_match。
+func _start_mm_rpc_async(rpc_join: String, rpc_poll: String, join_payload: String = "") -> String:
+	_mm_abort_requested = false
 	if not _matchmaker_ticket.is_empty():
 		return "已在匹配中"
 	if not await ensure_realtime_ready_async():
 		return "无法连接实时服务"
+	if _mm_abort_requested or not is_logged_in():
+		return MATCHMAKING_INTERRUPTED
 	var client: NakamaClient = get_client()
-	var rpc_res = await client.rpc_async(session, "ddz_mm_join", "")
-	if rpc_res.is_exception():
+	var rpc_res = await client.rpc_async(session, rpc_join, join_payload)
+	if _mm_abort_requested or not is_logged_in():
+		return MATCHMAKING_INTERRUPTED
+	if rpc_res == null:
+		return "网络异常"
+	if rpc_res.has_method("is_exception") and rpc_res.is_exception():
 		return rpc_res.get_exception().message
 	var jp := JSON.new()
 	if jp.parse(rpc_res.payload) != OK:
@@ -189,8 +290,17 @@ func start_matchmaking_authoritative_async() -> String:
 		return "无 ticket"
 	_matchmaker_ticket = t
 	while true:
-		var pr = await client.rpc_async(session, "ddz_mm_poll", JSON.stringify({"ticket": t}))
-		if pr.is_exception():
+		if _mm_abort_requested or not is_logged_in():
+			_matchmaker_ticket = ""
+			return MATCHMAKING_INTERRUPTED
+		var pr = await client.rpc_async(session, rpc_poll, JSON.stringify({"ticket": t}))
+		if _mm_abort_requested or not is_logged_in():
+			_matchmaker_ticket = ""
+			return MATCHMAKING_INTERRUPTED
+		if pr == null:
+			_matchmaker_ticket = ""
+			return "网络异常"
+		if pr.has_method("is_exception") and pr.is_exception():
 			_matchmaker_ticket = ""
 			return pr.get_exception().message
 		var jp2 := JSON.new()
@@ -210,6 +320,9 @@ func start_matchmaking_authoritative_async() -> String:
 			if mid.is_empty():
 				_matchmaker_ticket = ""
 				return "缺少 match_id"
+			if _mm_abort_requested or not is_logged_in():
+				_matchmaker_ticket = ""
+				return MATCHMAKING_INTERRUPTED
 			await _join_authoritative_match_by_id(mid)
 			_matchmaker_ticket = ""
 			return ""
@@ -218,6 +331,9 @@ func start_matchmaking_authoritative_async() -> String:
 			_matchmaker_ticket = ""
 			return "场景已释放"
 		await tree.create_timer(1.0).timeout
+		if _mm_abort_requested or not is_logged_in():
+			_matchmaker_ticket = ""
+			return MATCHMAKING_INTERRUPTED
 	return ""
 
 
@@ -245,15 +361,53 @@ func send_ddz_authoritative_async(op_code: int, payload: Dictionary) -> void:
 	_rt_socket.send_match_state_raw_async(mid, op_code, js.to_utf8_buffer())
 
 
-func cancel_matchmaking_async() -> void:
-	if _matchmaker_ticket.is_empty():
+## 掼蛋：发送客户端动作（GD_REQ_*）到服务端 Match。
+func send_guandan_action_async(op_code: int, payload: Dictionary) -> void:
+	if not is_in_online_match() or _rt_socket == null:
 		return
+	var mid: String = get_online_match_id()
+	if mid.is_empty():
+		return
+	var js: String = JSON.stringify(payload)
+	_rt_socket.send_match_state_raw_async(mid, op_code, js.to_utf8_buffer())
+
+
+func send_meow_kill_action_async(op_code: int, payload: Dictionary) -> void:
+	if not is_in_online_match() or _rt_socket == null:
+		return
+	var mid: String = get_online_match_id()
+	if mid.is_empty():
+		return
+	var js: String = JSON.stringify(payload)
+	_rt_socket.send_match_state_raw_async(mid, op_code, js.to_utf8_buffer())
+
+
+func cancel_matchmaking_async() -> void:
+	_mm_abort_requested = true
 	var t := _matchmaker_ticket
 	_matchmaker_ticket = ""
-	if t.begins_with("ddzmm_"):
+	if t.is_empty():
+		return
+	if t.begins_with(MEOW_KILL_MM_TICKET_PREFIX):
+		if is_logged_in():
+			var client_mk: NakamaClient = get_client()
+			var res_mk = await client_mk.rpc_async(session, RPC_MEOW_KILL_MM_CANCEL, JSON.stringify({"ticket": t}))
+			if res_mk != null and res_mk.has_method("is_exception") and res_mk.is_exception():
+				push_warning("猫猫杀匹配取消: %s" % res_mk.get_exception().message)
+		return
+	if t.begins_with(GUANDAN_RPC_TICKET_PREFIX):
+		if is_logged_in():
+			var client_g: NakamaClient = get_client()
+			var res_g = await client_g.rpc_async(session, RPC_GUANDAN_MM_CANCEL, JSON.stringify({"ticket": t}))
+			if res_g != null and res_g.has_method("is_exception") and res_g.is_exception():
+				push_warning("掼蛋匹配取消: %s" % res_g.get_exception().message)
+		return
+	if t.begins_with(MM_TICKET_PREFIX):
 		if is_logged_in():
 			var client: NakamaClient = get_client()
-			await client.rpc_async(session, "ddz_mm_cancel", JSON.stringify({"ticket": t}))
+			var res_d = await client.rpc_async(session, RPC_MM_CANCEL, JSON.stringify({"ticket": t}))
+			if res_d != null and res_d.has_method("is_exception") and res_d.is_exception():
+				push_warning("匹配取消: %s" % res_d.get_exception().message)
 		return
 	if _rt_socket != null:
 		await _rt_socket.remove_matchmaker_async(t)
@@ -263,15 +417,26 @@ func _join_authoritative_match_by_id(mid: String) -> void:
 	if _rt_socket == null:
 		online_match_join_failed.emit()
 		return
+	if _mm_abort_requested or not is_logged_in():
+		return
 	var m: NakamaRTAPI.Match = await _rt_socket.join_match_async(mid)
+	if _mm_abort_requested or not is_logged_in():
+		return
 	if m.is_exception():
 		push_warning("join_match: %s" % m.get_exception().message)
 		online_match_join_failed.emit()
 		return
 	var ok: NakamaRTAPI.Match = m as NakamaRTAPI.Match
-	print("[OnlineSession] join_match ok match_id=%s authoritative=%s" % [ok.match_id, ok.authoritative])
-	_ddz_rt_buffering = true
-	_ddz_rt_buffer.clear()
+	print("[OnlineSession] join_match ok match_id=%s authoritative=%s game=%s" % [ok.match_id, ok.authoritative, current_game_id])
+	if current_game_id == "guandan":
+		_gd_rt_buffering = true
+		_gd_rt_buffer.clear()
+	elif current_game_id == "meow_kill":
+		_mk_rt_buffering = true
+		_mk_rt_buffer.clear()
+	else:
+		_ddz_rt_buffering = true
+		_ddz_rt_buffer.clear()
 	active_rt_match = ok
 	matchmaker_succeeded.emit()
 
@@ -451,6 +616,36 @@ func replay_rt_ddz_buffer() -> void:
 	_ddz_rt_buffering = false
 
 
+func _emit_gd_server(op: int, d: Dictionary) -> void:
+	if _gd_rt_buffering:
+		_gd_rt_buffer.append({"op": op, "d": d.duplicate(true)})
+		while _gd_rt_buffer.size() > _DDZ_RT_BUFFER_MAX:
+			_gd_rt_buffer.pop_front()
+	match_gd_server.emit(op, d)
+
+
+func replay_rt_gd_buffer() -> void:
+	for item in _gd_rt_buffer:
+		match_gd_server.emit(int(item["op"]), item["d"] as Dictionary)
+	_gd_rt_buffer.clear()
+	_gd_rt_buffering = false
+
+
+func _emit_mk_server(op: int, d: Dictionary) -> void:
+	if _mk_rt_buffering:
+		_mk_rt_buffer.append({"op": op, "d": d.duplicate(true)})
+		while _mk_rt_buffer.size() > _DDZ_RT_BUFFER_MAX:
+			_mk_rt_buffer.pop_front()
+	match_meow_kill_server.emit(op, d)
+
+
+func replay_rt_mk_buffer() -> void:
+	for item in _mk_rt_buffer:
+		match_meow_kill_server.emit(int(item["op"]), item["d"] as Dictionary)
+	_mk_rt_buffer.clear()
+	_mk_rt_buffering = false
+
+
 func _on_rt_match_state(p_state) -> void:
 	if not (p_state is NakamaRTAPI.MatchData):
 		return
@@ -476,6 +671,12 @@ func _on_rt_match_state(p_state) -> void:
 	var opc: int = int(md.op_code)
 	if opc == DDZ_OP_SNAPSHOT or opc == DDZ_OP_ERROR or opc == DDZ_OP_SETTLEMENT:
 		_emit_ddz_server(opc, dict)
+		return
+	if opc == GD_OP_SNAPSHOT or opc == GD_OP_ERROR or opc == GD_OP_SETTLEMENT or opc == GD_OP_HINT:
+		_emit_gd_server(opc, dict)
+		return
+	if opc == MK_OP_SNAPSHOT or opc == MK_OP_ERROR:
+		_emit_mk_server(opc, dict)
 		return
 	match md.op_code:
 		MATCH_OP_TURN_SYNC:
@@ -515,6 +716,10 @@ func _on_rt_socket_closed() -> void:
 func leave_online_match_cleanup_async() -> void:
 	_ddz_rt_buffer.clear()
 	_ddz_rt_buffering = false
+	_gd_rt_buffer.clear()
+	_gd_rt_buffering = false
+	_mk_rt_buffer.clear()
+	_mk_rt_buffering = false
 	await leave_match_chat_async()
 	if not is_in_online_match():
 		cleanup_match_enet_if_any()
@@ -528,7 +733,7 @@ func leave_online_match_cleanup_async() -> void:
 
 
 func _on_rt_matchmaker_matched(matched) -> void:
-	## 三人凑齐后由服务端 registerMatchmakerMatched -> matchCreate("ddz") 填入 match_id；若 Active Matches 仍为 0，优先查服务端 runtime 与 Nakama 日志。
+	## 内置 Matchmaker 路径：服务端 `registerMatchmakerMatched` → `matchCreate(AUTHORITY_GAME_MATCH_LABEL, …)`；自建队列路径见 `RPC_MM_*`。若 match_id 为空，查 runtime 与 Nakama 日志。
 	if matched == null:
 		push_error("matchmaker_matched: 收到空对象")
 		online_match_join_failed.emit()
@@ -555,9 +760,16 @@ func _on_rt_matchmaker_matched(matched) -> void:
 		online_match_join_failed.emit()
 		return
 	var ok: NakamaRTAPI.Match = m as NakamaRTAPI.Match
-	print("[OnlineSession] join_matched ok match_id=%s authoritative=%s" % [ok.match_id, ok.authoritative])
-	_ddz_rt_buffering = true
-	_ddz_rt_buffer.clear()
+	print("[OnlineSession] join_matched ok match_id=%s authoritative=%s game=%s" % [ok.match_id, ok.authoritative, current_game_id])
+	if current_game_id == "guandan":
+		_gd_rt_buffering = true
+		_gd_rt_buffer.clear()
+	elif current_game_id == "meow_kill":
+		_mk_rt_buffering = true
+		_mk_rt_buffer.clear()
+	else:
+		_ddz_rt_buffering = true
+		_ddz_rt_buffer.clear()
 	active_rt_match = m
 	matchmaker_succeeded.emit()
 
@@ -583,12 +795,26 @@ func refresh_profile_async() -> void:
 		profile_username = session.username
 
 
+## 更新 Nakama 账号展示昵称与地区（用户名/邮箱不在此修改）。
+func update_profile_fields_async(display_name: String, location: String) -> String:
+	if not is_logged_in():
+		return "未登录"
+	var dn: String = display_name.strip_edges()
+	var loc: String = location.strip_edges()
+	var client: NakamaClient = get_client()
+	var res: NakamaAsyncResult = await client.update_account_async(session, null, dn if not dn.is_empty() else null, null, null, loc if not loc.is_empty() else null, null)
+	if res.is_exception():
+		return res.get_exception().message
+	await refresh_profile_async()
+	return ""
+
+
 ## 拉取或初始化游戏币（无存档或≤0 时服务端给 3000）。
 func sync_wallet_async() -> bool:
 	if not is_logged_in():
 		return false
 	var client: NakamaClient = get_client()
-	var res = await client.rpc_async(session, "wallet_sync", "")
+	var res = await client.rpc_async(session, RPC_WALLET_SYNC, "")
 	if res.is_exception():
 		push_warning("wallet_sync: %s" % res.get_exception().message)
 		return false
@@ -605,25 +831,15 @@ func sync_wallet_async() -> bool:
 	return true
 
 
-## 购买 +100 游戏币（测试用）；失败返回错误文案，成功返回空串。
-func buy_coins_async() -> String:
+## 游戏币≤0 时调用 `wallet_sync`，服务端将余额恢复为初始 3000（须先在大厅 `sync_wallet` 后确认本地 `wallet_coins`）。
+func reset_wallet_if_empty_async() -> String:
 	if not is_logged_in():
 		return "未登录"
-	var client: NakamaClient = get_client()
-	var res = await client.rpc_async(session, "wallet_buy", "")
-	if res.is_exception():
-		return res.get_exception().message
-	var jp := JSON.new()
-	if jp.parse(res.payload) != OK:
-		return "数据无效"
-	var root: Variant = jp.data
-	if typeof(root) != TYPE_DICTIONARY:
-		return "数据无效"
-	var d: Dictionary = root as Dictionary
-	if not bool(d.get("ok", false)):
-		return str(d.get("error", "购买失败"))
-	wallet_coins = int(d.get("coins", wallet_coins))
-	return ""
+	if wallet_coins > 0:
+		return "当前积分大于 0，无需重置"
+	if await sync_wallet_async():
+		return ""
+	return "重置失败，请稍后再试"
 
 
 ## 对局结算：按 delta 更新服务器余额（与 RPC `wallet_apply_delta` 一致）。
@@ -631,7 +847,7 @@ func apply_wallet_delta_async(delta: int) -> bool:
 	if not is_logged_in():
 		return false
 	var client: NakamaClient = get_client()
-	var res = await client.rpc_async(session, "wallet_apply_delta", JSON.stringify({"delta": delta}))
+	var res = await client.rpc_async(session, RPC_WALLET_APPLY_DELTA, JSON.stringify({"delta": delta}))
 	if res.is_exception():
 		push_warning("wallet_apply_delta: %s" % res.get_exception().message)
 		return false
@@ -724,10 +940,6 @@ func fetch_lobby_chat_history_async(p_limit: int = 40) -> Array:
 		if m is NakamaAPI.ApiChannelMessage:
 			out.append(m)
 	return out
-
-
-const _MATCH_CHAT_PREFIX := "ddz_match_"
-const _MATCH_CHAT_MAX_NAME := 64
 
 
 func match_chat_room_name_from_match_id(match_id: String) -> String:

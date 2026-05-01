@@ -1,12 +1,41 @@
 [gd_scene format=3 uid="uid://bu2jney644odb"]
 
 [ext_resource type="Script" uid="uid://dxq3pa4jmkwss" path="res://scripts/start_menu.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://2dyrtko4wkf8" path="res://CardsAssets/indexbg.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://CardsAssets/start.png" id="2_bg"]
 [ext_resource type="AudioStream" uid="uid://chxfc8x170cb8" path="res://MusicAssets/BGM.mp3" id="3_bgm"]
-[ext_resource type="Texture2D" uid="uid://1y3aek32rcfs" path="res://CardsAssets/index_b1.png" id="4_tex_b1"]
-[ext_resource type="Texture2D" uid="uid://txdk6oqa3ra5" path="res://CardsAssets/index_b2.png" id="5_tex_b2"]
-[ext_resource type="Texture2D" uid="uid://cwt3w4e6tave0" path="res://CardsAssets/index_b3.png" id="6_tex_b3"]
-[ext_resource type="Texture2D" uid="uid://croem62xomhe7" path="res://CardsAssets/index_b4.png" id="7_tex_b4"]
+
+[sub_resource type="StyleBoxEmpty" id="EmptyClickBtn"]
+
+[sub_resource type="StyleBoxFlat" id="VolSliderTrack"]
+bg_color = Color(0.1, 0.07, 0.05, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.38, 0.2, 0.65)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="VolGrabberArea"]
+bg_color = Color(0.45, 0.32, 0.18, 0.7)
+
+[sub_resource type="StyleBoxFlat" id="VolGrabber"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.78, 0.6, 0.32, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.26, 0.14, 0.9)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="AuthPanel_style"]
 content_margin_left = 18.0
@@ -100,122 +129,139 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="TopRightVolumeRow" type="MarginContainer" parent="."]
+[node name="MenuHotbar" type="Control" parent="."]
+z_index = 2
 layout_mode = 1
-z_index = 5
+mouse_filter = 2
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuHotrow" type="HBoxContainer" parent="MenuHotbar" unique_id=1148812432]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_left = 0.0
+anchor_top = 0.68
+anchor_right = 1.0
+anchor_bottom = 0.95
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="BtnSinglePlayer" type="Button" parent="MenuHotbar/MenuHotrow" unique_id=915890126]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+focus_mode = 0
+mouse_default_cursor_shape = 2
+mouse_filter = 0
+flat = true
+theme_override_styles/disabled = SubResource("EmptyClickBtn")
+theme_override_styles/hover = SubResource("EmptyClickBtn")
+theme_override_styles/normal = SubResource("EmptyClickBtn")
+theme_override_styles/pressed = SubResource("EmptyClickBtn")
+tooltip_text = "单机游戏"
+
+[node name="BtnOnline" type="Button" parent="MenuHotbar/MenuHotrow" unique_id=1663060978]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+focus_mode = 0
+mouse_default_cursor_shape = 2
+mouse_filter = 0
+flat = true
+theme_override_styles/disabled = SubResource("EmptyClickBtn")
+theme_override_styles/hover = SubResource("EmptyClickBtn")
+theme_override_styles/normal = SubResource("EmptyClickBtn")
+theme_override_styles/pressed = SubResource("EmptyClickBtn")
+tooltip_text = "联网对战"
+
+[node name="BtnSettings" type="Button" parent="MenuHotbar/MenuHotrow" unique_id=831934737]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+focus_mode = 0
+mouse_default_cursor_shape = 2
+mouse_filter = 0
+flat = true
+theme_override_styles/disabled = SubResource("EmptyClickBtn")
+theme_override_styles/hover = SubResource("EmptyClickBtn")
+theme_override_styles/normal = SubResource("EmptyClickBtn")
+theme_override_styles/pressed = SubResource("EmptyClickBtn")
+tooltip_text = "游戏设置"
+
+[node name="BtnExit" type="Button" parent="MenuHotbar/MenuHotrow" unique_id=1217071714]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+focus_mode = 0
+mouse_default_cursor_shape = 2
+mouse_filter = 0
+flat = true
+theme_override_styles/disabled = SubResource("EmptyClickBtn")
+theme_override_styles/hover = SubResource("EmptyClickBtn")
+theme_override_styles/normal = SubResource("EmptyClickBtn")
+theme_override_styles/pressed = SubResource("EmptyClickBtn")
+tooltip_text = "退出游戏"
+
+[node name="UiTop" type="CanvasLayer" parent="." unique_id=90001]
+layer = 5
+
+[node name="TopRightVolumeRow" type="MarginContainer" parent="UiTop" unique_id=90002]
+z_index = 0
+layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
+anchor_top = 0.0
 anchor_right = 1.0
-offset_left = -42.0
-offset_top = 10.0
-offset_right = -12.0
-offset_bottom = 20.0
+anchor_bottom = 0.0
+offset_left = -120.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 32.0
 grow_horizontal = 0
 grow_vertical = 0
+mouse_filter = 0
 
-[node name="BgmVolumeSlider" type="HSlider" parent="TopRightVolumeRow"]
+[node name="BgmVolumeSlider" type="HSlider" parent="UiTop/TopRightVolumeRow"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(30, 10)
+size_flags_vertical = 1
+custom_minimum_size = Vector2(112, 24)
 min_value = 0.0
 max_value = 100.0
 step = 1.0
 value = 0.0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+mouse_filter = 0
+theme_override_colors/color = Color(0.9, 0.82, 0.7, 1)
+theme_override_styles/slider = SubResource("VolSliderTrack")
+theme_override_styles/grabber_area = SubResource("VolGrabberArea")
+theme_override_styles/grabber = SubResource("VolGrabber")
 tooltip_text = "背景音乐音量"
-
-[node name="BottomDock" type="Control" parent="." unique_id=2080043111]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = -400.0
-offset_right = -12.0
-offset_bottom = -10.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="MenuColsHBox" type="HBoxContainer" parent="BottomDock" unique_id=1355982706]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 5
-alignment = 1
-
-[node name="MenuColLeft" type="VBoxContainer" parent="BottomDock/MenuColsHBox" unique_id=1148812433]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_constants/separation = 8
-
-[node name="BtnSinglePlayer" type="TextureButton" parent="BottomDock/MenuColsHBox/MenuColLeft" unique_id=915890126]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(474, 90)
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-texture_normal = ExtResource("4_tex_b1")
-texture_pressed = ExtResource("4_tex_b1")
-texture_hover = ExtResource("4_tex_b1")
-texture_disabled = ExtResource("4_tex_b1")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="BtnSettings" type="TextureButton" parent="BottomDock/MenuColsHBox/MenuColLeft" unique_id=831934737]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(474, 90)
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-texture_normal = ExtResource("6_tex_b3")
-texture_pressed = ExtResource("6_tex_b3")
-texture_hover = ExtResource("6_tex_b3")
-texture_disabled = ExtResource("6_tex_b3")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="MenuColRight" type="VBoxContainer" parent="BottomDock/MenuColsHBox" unique_id=471709695]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_constants/separation = 8
-
-[node name="BtnOnline" type="TextureButton" parent="BottomDock/MenuColsHBox/MenuColRight" unique_id=1663060978]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(474, 90)
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-texture_normal = ExtResource("5_tex_b2")
-texture_pressed = ExtResource("5_tex_b2")
-texture_hover = ExtResource("5_tex_b2")
-texture_disabled = ExtResource("5_tex_b2")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="BtnLeaderboard" type="TextureButton" parent="BottomDock/MenuColsHBox/MenuColRight" unique_id=1217071714]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(474, 90)
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-texture_normal = ExtResource("7_tex_b4")
-texture_pressed = ExtResource("7_tex_b4")
-texture_hover = ExtResource("7_tex_b4")
-texture_disabled = ExtResource("7_tex_b4")
-ignore_texture_size = true
-stretch_mode = 5
 
 [node name="AuthOverlay" type="CanvasLayer" parent="." unique_id=1238630914]
 unique_name_in_owner = true

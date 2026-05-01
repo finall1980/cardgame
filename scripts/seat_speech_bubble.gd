@@ -1,28 +1,31 @@
 extends Control
 class_name SeatSpeechBubble
-## 思考气泡：`StyleBoxFlat` 圆角矩形白底黑框；主体外接矩形宽:高 = 3:1；尾巴为三颗渐小圆。
+## 思考气泡：圆角矩形主体 + 三圆针脚；**主体宽高随文案测量**，不再强制固定比例。
 
 enum TailAnchor {
 	BOTTOM_LEFT,
 	BOTTOM_RIGHT,
 	RIGHT,
+	## 尾巴向左伸出（气泡主体在右），用于左侧玩家：气泡靠桌面中央、针脚指向左缘头像
+	LEFT,
 }
 
-const _TEXT_MAX_W_CAP := 148.0
+const _TEXT_MAX_W_CAP := 300.0
 const _PAD_H := 14.0
 const _PAD_TOP := 12.0
 const _PAD_BOTTOM := 14.0
 const _MAX_HEIGHT_FRAC := 0.38
-
-const _BODY_ASPECT_W := 3.0
-const _BODY_ASPECT_H := 1.0
+## 主体最小尺寸（避免圆角画不出来）
+const _BODY_MIN_W := 52.0
+const _BODY_MIN_H := 34.0
 
 const _TAIL_EXT := 38.0
 ## 主框与尾巴圆线宽（约为原先 2.75 的 1/4）
-const _OUTLINE_W := 0.6875
-const _CORNER_R_MAX := 16.0
-const _FILL_COLOR := Color(1.0, 1.0, 1.0, 1.0)
-const _STROKE_COLOR := Color(0.0, 0.0, 0.0, 1.0)
+const _OUTLINE_W := 1.0
+const _CORNER_R_MAX := 18.0
+## 暖色羊皮纸感气泡 + 古铜描边，与牌桌金绿协调
+const _FILL_COLOR := Color(0.97, 0.93, 0.84, 0.96)
+const _STROKE_COLOR := Color(0.48, 0.32, 0.12, 0.92)
 
 const _TAIL_R1 := 7.5
 const _TAIL_R2 := 5.2
@@ -48,6 +51,9 @@ func _ready() -> void:
 	_body_style.border_color = _STROKE_COLOR
 	var bw: int = maxi(1, int(round(_OUTLINE_W)))
 	_body_style.set_border_width_all(bw)
+	_body_style.shadow_color = Color(0, 0, 0, 0.28)
+	_body_style.shadow_size = 6
+	_body_style.shadow_offset = Vector2(0, 2)
 	if _label:
 		_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -96,6 +102,9 @@ func _tail_direction() -> Vector2:
 			return Vector2(1.0, 1.0).normalized()
 		TailAnchor.RIGHT:
 			return Vector2(1.0, 0.28).normalized()
+		TailAnchor.LEFT:
+			# 向左并略向下，从信息区下方指向左侧头像
+			return Vector2(-1.0, 0.42).normalized()
 	return Vector2.RIGHT
 
 
@@ -145,20 +154,29 @@ func set_tail_anchor(anchor: TailAnchor) -> void:
 	call_deferred("queue_redraw")
 
 
+## 尾巴圆点链最外侧（气泡泡尖约指向此处），供桌面把该点对齐到头像中心
+func get_tail_tip_local() -> Vector2:
+	if _body_rect.size.x < 2.0:
+		return size * 0.5
+	var dir: Vector2 = _tail_direction()
+	var edge: Vector2 = _body_edge_point_on_rect(_body_rect, dir)
+	var c1: Vector2 = edge + dir * (_TAIL_R1 + 3.0)
+	var step12: float = _TAIL_R1 + _TAIL_R2 + _TAIL_GAP
+	var step23: float = _TAIL_R2 + _TAIL_R3 + _TAIL_GAP
+	var c2: Vector2 = c1 + dir * step12
+	var c3: Vector2 = c2 + dir * step23
+	return c3 + dir * _TAIL_R3
+
+
 func _compute_body_size(need_w: float, need_h: float) -> Vector2:
-	var body_h: float = maxf(need_h, need_w * _BODY_ASPECT_H / _BODY_ASPECT_W)
-	var body_w: float = body_h * _BODY_ASPECT_W / _BODY_ASPECT_H
-	if body_w < need_w:
-		body_w = need_w
-		body_h = body_w * _BODY_ASPECT_H / _BODY_ASPECT_W
-	return Vector2(body_w, body_h)
+	return Vector2(maxf(need_w, _BODY_MIN_W), maxf(need_h, _BODY_MIN_H))
 
 
 func _compute_control_size(body: Vector2) -> Vector2:
 	match _tail_anchor:
 		TailAnchor.BOTTOM_LEFT, TailAnchor.BOTTOM_RIGHT:
 			return Vector2(body.x + _TAIL_EXT, body.y + _TAIL_EXT * 0.35)
-		TailAnchor.RIGHT:
+		TailAnchor.RIGHT, TailAnchor.LEFT:
 			return Vector2(body.x + _TAIL_EXT * 1.55, body.y + _TAIL_EXT * 0.65)
 	return body + Vector2(_TAIL_EXT, _TAIL_EXT)
 
@@ -171,6 +189,8 @@ func _body_rect_for_size(total: Vector2, body: Vector2) -> Rect2:
 			return Rect2(Vector2(total.x - body.x - _TAIL_EXT, _TAIL_EXT * 0.35), body)
 		TailAnchor.RIGHT:
 			return Rect2(Vector2(_TAIL_EXT * 0.45, _TAIL_EXT * 0.25), body)
+		TailAnchor.LEFT:
+			return Rect2(Vector2(total.x - body.x - _TAIL_EXT * 0.45, _TAIL_EXT * 0.25), body)
 	return Rect2(Vector2.ZERO, body)
 
 
@@ -178,7 +198,7 @@ func _infer_body_from_total(total: Vector2) -> Vector2:
 	match _tail_anchor:
 		TailAnchor.BOTTOM_LEFT, TailAnchor.BOTTOM_RIGHT:
 			return Vector2(total.x - _TAIL_EXT, total.y - _TAIL_EXT * 0.35)
-		TailAnchor.RIGHT:
+		TailAnchor.RIGHT, TailAnchor.LEFT:
 			return Vector2(total.x - _TAIL_EXT * 1.55, total.y - _TAIL_EXT * 0.65)
 	return total
 
@@ -211,32 +231,58 @@ func _after_say_layout(duration_sec: float) -> void:
 	await get_tree().process_frame
 	if _label == null:
 		return
+	var text: String = _label.text
 	var vr: Rect2 = get_viewport().get_visible_rect()
-	var max_h: float = maxf(80.0, vr.size.y * _MAX_HEIGHT_FRAC)
-	var tw: float = _effective_text_max_w()
-	var max_tw: float = minf(_TEXT_MAX_W_CAP + 100.0, vr.size.x - 28.0)
-	var need_w: float = tw + _PAD_H * 2.0
-	var need_h: float = 0.0
-	for _i in range(18):
-		_label.custom_minimum_size = Vector2(tw, 0)
-		_label.size = Vector2(tw, 0)
-		await get_tree().process_frame
-		var ch: float = float(_label.get_combined_minimum_size().y)
-		if ch < 2.0:
-			var lh: float = float(_label.get_line_height())
-			var n: int = max(1, _label.get_line_count())
-			ch = lh * float(n)
-		need_h = ch + _PAD_TOP + _PAD_BOTTOM
-		need_w = tw + _PAD_H * 2.0
-		if need_h <= max_h or tw >= max_tw - 0.5:
+	var max_inner_h: float = maxf(36.0, vr.size.y * _MAX_HEIGHT_FRAC - _PAD_TOP - _PAD_BOTTOM)
+	var max_tw_inner: float = minf(_effective_text_max_w(), vr.size.x - 32.0 - _PAD_H * 2.0)
+	max_tw_inner = maxf(max_tw_inner, 48.0)
+
+	var font: Font = _label.get_theme_font("font")
+	if font == null:
+		font = ThemeDB.fallback_font
+	var fs: int = _label.get_theme_font_size("font_size")
+	var line_fallback: float = maxf(float(font.get_height(fs)), 14.0)
+
+	var raw_w: float = 24.0
+	if not text.is_empty():
+		raw_w = float(font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x)
+	# 先按「单行自然宽度」起算，再放宽直到总高不超出；最后二分收窄宽度
+	var tw: float = clampf(raw_w + 14.0, 32.0, max_tw_inner)
+	var ms: Vector2 = font.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, tw, fs)
+	if ms.y < 1.5:
+		ms.y = line_fallback
+	var guard: int = 0
+	while ms.y > max_inner_h and tw < max_tw_inner - 0.5 and guard < 64:
+		tw = minf(tw + maxf(10.0, (ms.y - max_inner_h) * 0.22), max_tw_inner)
+		ms = font.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, tw, fs)
+		guard += 1
+
+	var h0: float = maxf(ms.y, line_fallback)
+	var lo: float = 32.0
+	var hi: float = tw
+	for _shrink in range(24):
+		if hi - lo < 2.5:
 			break
-		tw = minf(tw + 18.0, max_tw)
+		var mid: float = (lo + hi) * 0.5
+		var tm: Vector2 = font.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, mid, fs)
+		var th: float = maxf(tm.y, line_fallback)
+		if th > h0 + 0.85:
+			lo = mid
+		else:
+			hi = mid
+	tw = hi
+	ms = font.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, tw, fs)
+	if ms.y < 1.5:
+		ms.y = line_fallback
+
+	var need_w: float = tw + _PAD_H * 2.0
+	var need_h: float = ms.y + _PAD_TOP + _PAD_BOTTOM
 	var body: Vector2 = _compute_body_size(need_w, need_h)
 	var total: Vector2 = _compute_control_size(body)
 	custom_minimum_size = total
 	size = total
 	_body_rect = _body_rect_for_size(total, body)
-	var inner_w: float = _body_rect.size.x - _PAD_H * 2.0
+	var inner_w: float = maxf(8.0, _body_rect.size.x - _PAD_H * 2.0)
 	_label.custom_minimum_size = Vector2(inner_w, 0)
 	_label.position = _body_rect.position + Vector2(_PAD_H, _PAD_TOP)
 	_label.size = Vector2(inner_w, _body_rect.size.y - _PAD_TOP - _PAD_BOTTOM)

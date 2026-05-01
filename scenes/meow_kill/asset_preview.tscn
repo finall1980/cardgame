@@ -1,0 +1,88 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmeowkillpreview1"]
+
+[ext_resource type="Script" path="res://scripts/meow_kill/asset_preview.gd" id="1_scr"]
+
+[node name="MeowKillAssetPreview" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_scr")
+
+[node name="Bg" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.12, 0.11, 0.14, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+horizontal_scroll_mode = 0
+
+[node name="VBox" type="VBoxContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.75, 1)
+theme_override_font_sizes/font_size = 22
+text = "猫猫杀 · 资源预览"
+
+[node name="HintLabel" type="Label" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.8, 0.72, 1)
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+
+[node name="L1" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.82, 0.7, 1)
+theme_override_font_sizes/font_size = 16
+text = "手牌（big-card）"
+
+[node name="HandRow" type="HBoxContainer" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="L2" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.82, 0.7, 1)
+theme_override_font_sizes/font_size = 16
+text = "出牌区（card）"
+
+[node name="PlayRow" type="HBoxContainer" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="L3" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.82, 0.7, 1)
+theme_override_font_sizes/font_size = 16
+text = "武将牌（拼接或预合成）"
+
+[node name="GeneralStack" type="Control" parent="Scroll/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 210)
+layout_mode = 2
+size_flags_horizontal = 0

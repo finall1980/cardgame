@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "rootDir": "./",
+    "outFile": "./build/test_rules.js",
+    "strict": true,
+    "skipLibCheck": true,
+    "ignoreDeprecations": "6.0"
+  },
+  "files": [
+    "./src/nakama_env.d.ts",
+    "./src/games/guandan/match_state.ts",
+    "./src/games/guandan/rules.ts",
+    "./test/rules_test.ts"
+  ]
+}

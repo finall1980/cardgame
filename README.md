@@ -1,58 +1,102 @@
-# 三猫斗地主（CardGame）
+# CardGame（三猫棋牌 · Godot × Nakama）
 
-使用 **Godot 4.6** 与 **GDScript** 实现的单机三人斗地主（斗地主规则 + 三只猫咪角色）。工程名：`DouDizhu`。
+本仓库是一套 **Godot 4.6** 客户端 + **Nakama** 服务端逻辑（TypeScript Runtime）的工程：除本地可玩的斗地主外，已扩展 **联机匹配大厅、钱包与资料、掼蛋、猫猫杀** 等多种玩法与设计文档。**权威对局逻辑**在 `Modules` 编译产物中跑的 Match / RPC。
 
-## 功能概览
+## 内容概览
 
-- **流程**：开始菜单 → 对局（摸牌动画 → 叫地主选倍 → 抢地主 → 轮流出牌 → 结算）
-- **角色**：丑丑妹、咪宝、毛睿睿；座位与猫身份每**盘**随机，局间不换角
-- **AI**：两路 AI 按猫咪风格区分进攻性；人类可使用 **提示**（按当前档位逻辑预选牌）
-- **规则**：标准斗地主牌型，含炸弹、王炸；**最终倍率** = 叫地主基础倍率 × 抢地主 × 出牌阶段炸弹/王炸加翻；结算展示倍率明细，**猫草**按倍率结算
-- **界面**：牌桌背景图、全局主题、头像圆形描边；右上角 **设置**（BGM 音量、重新发牌、返回开始界面）；出牌区 **提示 / 出牌 / 过**
-- **对话**：座位旁 **圆角矩形** 气泡（代码绘制，白底描边），带尾巴朝向头像
-- **弹窗**：设置内操作使用与牌桌风格一致的 **确认对话框**（非系统原生样式）
+| 层级 | 说明 |
+|------|------|
+| **客户端** | Godot 主菜单 `scenes/start_menu.tscn`；单机斗地主或登录后进入 `multiplayer_lobby` 匹配；各玩法独立主场景（见下表）。 |
+| **联机** | `scripts/online_session.gd`（Autoload `OnlineSession`）管理 Nakama 会话、匹配、钱包同步与房间 Realtime。 |
+| **服务端** | `Modules/src/` TypeScript → `Modules/build/index.js`，由 Nakama 挂载；注册 **斗地主 / 掼蛋 / 猫猫杀** Match 与对应匹配 RPC、钱包相关 RPC 等。 |
+| **Web 导出** | `WebApp/`：Godot HTML5 导出 + `serve.py` 静态服务；云部署说明见 `WebApp/DEPLOY.md`。 |
 
-规则说明与牌型细节见仓库根目录 [rule.md](rule.md)，设计与流程见 [docs/DESIGN.md](docs/DESIGN.md)。
+## 玩法与入口（客户端）
+
+| 玩法 | 场景 / 脚本（节选） | 服务端 Match 名 |
+|------|---------------------|-----------------|
+| 斗地主（单机 + 联机） | `scenes/main.tscn`、`scripts/main.gd` | `ddz` |
+| 掼蛋 | `scenes/guandan/main.tscn`、`scripts/guandan/` | `guandan` |
+| 猫猫杀 | `scenes/meow_kill/main.tscn`、`scripts/meow_kill/` | `meow_kill` |
+| 联机大厅 | `scenes/multiplayer_lobby.tscn`、`scripts/multiplayer_lobby.gd` | —（匹配后按 `current_game_id` 切场景） |
+
+设计文档分散在 `docs/`（如 `guandan_DESIGN.md`、`meow_kill_*.md` 等）；斗地主规则摘要见根目录 [rule.md](rule.md)。
 
 ## 环境要求
 
-- [Godot 4.6](https://godotengine.org/download/)（与 `project.godot` 中 `config/features` 一致）
+- **运行游戏**：与 `project.godot` 一致，推荐 [Godot 4.6](https://godotengine.org/download/)（特性 `4.6 / Forward Plus`）。
+- **编译 Nakama 模块**：Node.js + npm，用于 `Modules` 下 TypeScript 构建。
+- **本地或服务器跑 Nakama**：Docker（仓库根目录 `docker-compose.yml`；当前编排包含 **Nakama、CockroachDB、Prometheus**）。部署步骤与端口说明仍以 [NAKAMA_DEPLOY.md](NAKAMA_DEPLOY.md) 为准；若编排与备忘文档不一致，**以仓库内实际 `docker-compose.yml` 为准**，自行调整挂载路径与环境变量。
 
-## 运行方式
+## 快速开始（仅客户端）
 
-1. 在 Godot 中 **导入** 本目录（需含 `project.godot`）
-2. 按 **F5** 运行，或确保主场景为 `scenes/start_menu.tscn`（默认已配置）
+1. 用 Godot 打开本仓库（含 `project.godot`）。
+2. **F5** 运行；主场景为 `scenes/start_menu.tscn`。
 
-## 目录结构（节选）
+单机斗地主可不启 Nakama；**联机、匹配、钱包**需在客户端配置 Nakama 地址（见 `online_session.gd` 与相关场景），且服务端已加载最新 `Modules/build/index.js`。
 
-| 路径 | 说明 |
-|------|------|
-| `scenes/` | `start_menu.tscn`、`main.tscn`、`seat_speech_bubble.tscn` 等 |
-| `scripts/` | `main.gd` 主流程、`ddz_rules.gd`、`ddz_ai.gd`、`deck.gd`、`card_defs.gd`、`seat_speech_bubble.gd`、`play_line_builder.gd` |
-| `theme/` | `game_theme.tres` 等全局 UI 主题 |
-| `CardsAssets/` | 牌面、牌背、牌桌背景 `cardbg.png` 等 |
-| `assets/` | 头像、UI 贴图等 |
-| `audio/`、`MusicAssets/` | 音效与 BGM（含 mp3） |
-| `shaders/` | 如头像圆环 `avatar_circle.gdshader` |
-
-## Git 使用说明
+## Nakama 模块（服务端逻辑）
 
 ```bash
-# 克隆（将 URL 换成你的远程地址）
-git clone <仓库 URL> CardGame
-cd CardGame
+cd Modules
+npm install
+npm run build          # 输出 Modules/build/index.js
+npm test               # 可选：规则等单测（tsconfig.test.json）
+```
 
-# 提交并推送
-git add -A
-git status
-git commit -m "说明本次改动的完整句子"
+将构建目录挂载到 Nakama `--runtime.path`（具体见 `docker-compose.yml` volumes 与你的服务器路径）。
+
+已注册玩法入口见 `Modules/src/main.ts`（节选）：钱包 RPC，`ddz` / `guandan` / `meow_kill` Match，以及各玩法 `*_mm_*` 匹配 RPC 等。
+
+## Web 导出（可选）
+
+Godot Web 导出到 `WebApp/` 后，可用：
+
+```bash
+cd WebApp
+python3 serve.py --bind 0.0.0.0 -p 8765
+```
+
+HTTPS、证书与 nginx/caddy 反代详见 [WebApp/DEPLOY.md](WebApp/DEPLOY.md)。
+
+## 目录结构（扩展版）
+
+```
+CardGame/
+├── scenes/              # 各玩法与大厅、起始菜单场景
+├── scripts/             # GDScript（含 online_session、各玩法入口逻辑）
+├── Modules/             # Nakama TS 运行时源码与 build/index.js
+├── addons/               # Nakama Godot SDK 等插件
+├── assets/、CardsAssets/、meowkill/   # 贴图与桌游素材（按玩法引用）
+├── WebApp/              # HTML5 导出与 serve.py
+├── docs/                # 各玩法与设计备忘
+├── docker-compose.yml    # Nakama / DB / Prometheus 本地编排示例
+├── NAKAMA_DEPLOY.md     # TS 编译、启停与排错备忘
+├── rule.md               # 斗地主规则摘要
+├── project.godot
+└── README.md
+```
+
+更多历史设计见 [docs/DESIGN.md](docs/DESIGN.md)（若以仓库内为准）。
+
+## Git 与协作
+
+```bash
+git clone <仓库 URL>
+cd CardGame
+# 开发与提交
+git add -A && git status
+git commit -m "动词开头、说明本次改动的完整句子。"
 git push origin main
 ```
 
-首次推送前请在托管平台（GitHub / GitLab 等）创建空仓库，并按提示配置 `git remote add origin …`。
+- Godot 本地缓存目录（如 `.godot/`）一般由 `.gitignore` 忽略，勿手提交。
+- 大体积导出目录若不希望进库，请在 `.gitignore` 中保持排除规则。
 
-> 说明：Godot 会在本地生成 `.godot/` 与导入缓存，已通过 `.gitignore` 忽略；请勿提交 **`WebApp/`** 导出目录（已忽略，体积大且可重新导出）。
+## 许可与素材
 
-## 许可
+仓库根若无 `LICENSE`，以所有者声明为准。第三方美术 / 音效 / 字体请遵循各自许可证；线上使用需注意 Nakama、Godot Web 与各素材的商用条款。
 
-若仓库根目录未附带 `LICENSE` 文件，以仓库所有者声明为准；第三方美术与音频素材请遵守各自版权与授权范围。
+---
+
+**一句话**：本项目是「**一只 Godot 壳 + Nakama 权威局**」的多玩法棋牌工程；改规则先动 `Modules/src/games/` 与用户端场景脚本，别忘了 `npm run build` 后重启或 reload Nakama Runtime。
